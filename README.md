@@ -12,7 +12,7 @@ Also, it can be integration with many web3 platforms like gaming, social media w
 # Functionalities For Users:
 1. Private Key management / ERC 4337
 2. Social Login - Register through Gmail/Google Accounts / Social accounts Onboarding through OAuth2
-3. Passwordless authentication and authorisation - Link-based authentication through Gmail or SMS - Will use AWS SES for emails or mobile services for sending links through SMSs.
+3. Passwordless authentication and authorisation - Link-based authentication through Gmail or SMS - Will use AWS SES for emails or mobile services for sending links through SMSs
 
 # UI/UX for the project
 
