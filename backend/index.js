@@ -17,17 +17,21 @@ mongoose.connect('mongodb://localhost:27017/upicrypto', {useNewUrlParser: true, 
  console.log(error)
 })
 
+// Reading all Transactions from TransactionBook
 
-// Reading a Transaction from TransactionBook
-
-app.get('/:id', (req, res) =>{
-	Transaction.findById(req.params.id, (err, txn) =>{
-		res.send(txn)
-	})
-})
+app.get('/', async(req, res) =>{
+  try {
+    const transactions = await Transaction.find({ });
+      res.send(transactions);
+      console.log(transactions);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 
 // Adding a Transaction to TransactionBook
 app.post('/add', (req, res) => {
+  console.log("user ID", req.body);
 	user_id = req.body.user_id,
 	fiat_wallet_id = req.body.fiat_wallet_id,
 	fiat_wallet_balance = req.body.fiat_wallet_balance,
@@ -100,7 +104,7 @@ app.post('/update/:id', (req, res) => {
 
 	transaction = { $set: transaction }
 
-	Transaction.update({_id: req.params.id}, transaction).then(() => {
+	Transaction.updateOne({_id: req.params.id}, transaction).then(() => {
 		res.send(transaction)
 	}).catch((err) => {
 		console.log(error)
@@ -111,7 +115,7 @@ app.post('/update/:id', (req, res) => {
 // Deleting the User from AddressBook
 
 app.delete('/delete/:id', (req, res) => {
-	Address.deleteOne({_id: req.params.id}).then(() => {
+	Transaction.deleteOne({_id: req.params.id}).then(() => {
 		res.send('Transaction deleted')
 	}).catch((err) => {
 		console.log(error)
