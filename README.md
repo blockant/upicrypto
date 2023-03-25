@@ -17,3 +17,12 @@ Also, it can be integration with many web3 platforms like gaming, social media w
 # UI/UX for the project
 
 ![image](https://user-images.githubusercontent.com/75947851/227715160-1ac967ce-b5c7-4e6a-aed4-60af872008f9.png)
+
+![image](https://user-images.githubusercontent.com/75947851/227715212-fc63467b-e6a8-44eb-9a30-f3692b180584.png)
+
+![image](https://user-images.githubusercontent.com/75947851/227715418-26b06986-16f2-41f3-a847-99706134a584.png)
+
+![image](https://user-images.githubusercontent.com/75947851/227715424-bd3267c8-fcfa-4b9d-b5cd-7530c43e24dc.png)
+
+![image](https://user-images.githubusercontent.com/75947851/227715428-9b54c30b-7d5e-4881-9a9d-c4e909150c46.png)
+
