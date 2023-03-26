@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 contract ModExp {
     // address constant MODEXP_BUILTIN = 0x0000000000000000000000000000000000000005;
 
-    function modexp(uint256 b, uint256 e, uint256 m) internal view returns (uint256 result) {
+    function modexp(uint256 b, uint256 e, uint256 m) internal returns (uint256 result) {
         assembly {
             let freemem := mload(0x40)
             mstore(freemem, 0x20)
@@ -30,7 +30,7 @@ contract ECMath is ModExp {
     uint256 constant N = 115792089210356248762697446949407573529996955224135760342422259061068512044369;
     uint256 constant H = 1;
 
-    function verify(uint256 qx, uint256 qy, uint256 e, uint256 r, uint256 s) public view returns (bool) {
+    function verify(uint256 qx, uint256 qy, uint256 e, uint256 r, uint256 s) public returns (bool) {
         uint256 w = invmod(s, N);
         uint256 u1 = mulmod(e, w, N);
         uint256 u2 = mulmod(r, w, N);
@@ -42,7 +42,7 @@ contract ECMath is ModExp {
         return r == x;
     }
 
-    function recover(uint256 e, uint8 v, uint256 r, uint256 s) public view returns (uint256[2] memory) {
+    function recover(uint256 e, uint8 v, uint256 r, uint256 s) public returns (uint256[2] memory) {
         uint256 eInv = N - e;
         uint256 rInv = invmod(r, N);
         uint256 srInv = mulmod(rInv, s, N);
@@ -111,10 +111,10 @@ contract ECMath is ModExp {
         return mulmod(y, y, P) == getSqrY(x);
     }
 
-    function decompressPoint(uint256 x, uint8 yBit) private view returns (uint256) {
+    function decompressPoint(uint256 x, uint8 yBit) private returns (uint256) {
         //return sqrt(x^3+Ax+B)
         uint256 absy = modexp(getSqrY(x), 1 + (P - 3) / 4, P);
-        return yBit == 0 ? absy : -absy;
+        return yBit == 0 ? absy : absy & (~absy + 1);
     }
 
     // point addition for elliptic curve in jacobian coordinates
@@ -169,7 +169,7 @@ contract ECMath is ModExp {
     }
 
     //jacobian to affine coordinates transformation
-    function JtoA(uint256[3] memory p) private view returns (uint256[2] memory Pnew) {
+    function JtoA(uint256[3] memory p) private returns (uint256[2] memory Pnew) {
         uint256 zInv = invmod(p[2], P);
         uint256 zInv2 = mulmod(zInv, zInv, P);
         Pnew[0] = mulmod(p[0], zInv2, P);
@@ -177,7 +177,7 @@ contract ECMath is ModExp {
     }
 
     //computing inverse by using fermat's theorem
-    function invmod(uint256 _a, uint256 _p) private view returns (uint256 invA) {
+    function invmod(uint256 _a, uint256 _p) private returns (uint256 invA) {
         invA = modexp(_a, _p - 2, _p);
     }
 }

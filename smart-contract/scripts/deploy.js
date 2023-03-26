@@ -1,6 +1,8 @@
 const hre = require("hardhat");
 
 async function main() {
+    const OWNER="0x41Eb71f017503327EcAAD2E4F6f05C3B962538B7"
+
     const EntryPointC = await hre.ethers.getContractFactory("EntryPoint");
     const entryPoint = await EntryPointC.deploy();
     await entryPoint.deployed();
@@ -9,15 +11,15 @@ async function main() {
     //////////////////////
     
     const Wallet = await hre.ethers.getContractFactory("SmartWallet");
-    const wallet = await Wallet.deploy("0x123456789", OWNER);
+    const wallet = await Wallet.deploy(entryPoint.address, OWNER);
     await wallet.deployed();
   
     console.log(`wallet deployed on polygon mumbai to ${wallet.address}`);
     /////////////////////
 
     const PayMaster = await hre.ethers.getContractFactory("PayMaster");
-    const paymaster = await PayMaster.deploy();
-    await paymaster.deployed(entryPoint.address);
+    const paymaster = await PayMaster.deploy(entryPoint.address);
+    await paymaster.deployed();
   
     console.log(`paymaster deployed on polygon mumbai to ${paymaster.address}`);
     /////////////////////
