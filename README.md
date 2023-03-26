@@ -14,6 +14,16 @@ Also, it can be integration with many web3 platforms like gaming, social media w
 2. Social Login - Register through Gmail/Google Accounts / Social accounts Onboarding through OAuth2
 3. Passwordless authentication and authorisation - Link-based authentication through Gmail or SMS - Will use AWS SES for emails or mobile services for sending links through SMSs.
 
+# Deployed Contracts
+1. Paymaster Contract: https://mumbai.polygonscan.com/address/0xE6B255a6719f89BEE60dF0bcc971e49212Ff95F8#writeContract
+2. UpiCrypto SmartWallet Contract: https://mumbai.polygonscan.com/address/0x29C23DE681878F96435451e149570bb10ebE4CE1#writeContract
+3. EntryPoint Contract: https://mumbai.polygonscan.com/address/0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560#writeContract
+4. Delegate Payment Contract: https://mumbai.polygonscan.com/address/0x9afae241d8d7d268fff21c74c4eee319583d4458#writeContract
+5. MockERC20 Contract: https://mumbai.polygonscan.com/address/0x1dcd6c91cE4F12CD4e9969A047E43877ADE66A59#writeContract
+
+
+
+
 # UI/UX for the project
 
 ![image](https://user-images.githubusercontent.com/75947851/227715160-1ac967ce-b5c7-4e6a-aed4-60af872008f9.png)
