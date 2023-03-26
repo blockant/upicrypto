@@ -28,6 +28,7 @@ app.get('/:id', (req, res) =>{
 
 // Adding a Transaction to TransactionBook
 app.post('/add', (req, res) => {
+  console.log("heyyyyyyyyy:::", req.body)
 	user_id = req.body.user_id,
 	fiat_wallet_id = req.body.fiat_wallet_id,
 	fiat_wallet_balance = req.body.fiat_wallet_balance,
