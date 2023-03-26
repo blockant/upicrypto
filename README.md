@@ -1,4 +1,4 @@
-# upicrypto
+# UpiCrypto
 Unified Payment Interface for Crypto
 
 # Project Description
