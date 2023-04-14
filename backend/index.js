@@ -7,7 +7,7 @@ const Transaction = require('./model/models')
 const app = express();
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // Connecting to DB
 mongoose.connect('mongodb://localhost:27017/upicrypto', {useNewUrlParser: true, useUnifiedTopology: true
@@ -29,8 +29,10 @@ app.get('/', async(req, res) =>{
     }
   });
 
-// Adding a Transaction to TransactionBook
-app.post('/add', (req, res) => {
+
+// # BUNDLERS #  
+// Adding a Transaction for Utility token transfer using Bundlers to TransactionBook
+app.post('/transferUtility', (req, res) => {
   console.log("user ID", req.body);
 	user_id = req.body.user_id,
 	fiat_wallet_id = req.body.fiat_wallet_id,
@@ -78,6 +80,356 @@ app.post('/add', (req, res) => {
 	})
 })
 
+
+// Adding a Transaction for ERC20 transfer using Bundlers to TransactionBook
+app.post('/transferERC20', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+
+// Adding a Transaction for Utility token batch transfer using Bundlers to TransactionBook
+app.post('/batchTransferUtility', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+// Adding a Transaction for ERC20 tokens batch transfer using Bundlers to TransactionBook
+app.post('/batchtransferERC20', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+
+// # Paymaster #
+// Adding a Transaction for Utility token transfer using Paymaster to TransactionBook
+app.post('/transferUtilityWithPaymaster', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+
+// Adding a Transaction for ERC20 transfer using Paymaster to TransactionBook
+app.post('/transferERC20WithPaymaster', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+
+// Adding a Transaction for Utility token batch transfer using Paymaster to TransactionBook
+app.post('/batchTransferUtilityWithPaymaster', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+// Adding a Transaction for ERC20 tokens batch transfer using Paymaster to TransactionBook
+app.post('/batchtransferERC20WithPaymaster', (req, res) => {
+  console.log("user ID", req.body);
+	user_id = req.body.user_id,
+	fiat_wallet_id = req.body.fiat_wallet_id,
+	fiat_wallet_balance = req.body.fiat_wallet_balance,
+	fiat_wallet_currency = req.body.fiat_wallet_currency,
+  crypto_wallet_id = req.body.crypto_wallet_id,
+  crypto_wallet_balance = req.body.crypto_wallet_balance,
+  crypto_wallet_currency = req.body.crypto_wallet_currency,
+  email = req.body.email,
+  txn_client_name = req.body.txn_client_name,
+  txn_client_id = req.body.txn_client_id;
+  crypto_txn_fee = req.body.crypto_txn_fee,
+  crypto_txn_currency = req.body.crypto_txn_currency,
+  fiat_txn_fee = req.body.fiat_txn_fee,
+  fiat_txn_currency = req.body.fiat_txn_currency,
+  txn_type = req.body.txn_type,
+  txn_mode = req.body.txn_mode,
+  crypto_currency_type = req.body.crypto_currency_type,
+  timestamp = req.body.timestamp
+
+	let newTransaction = new Transaction({
+    user_id: user_id,
+    fiat_wallet_id: fiat_wallet_id,
+    fiat_wallet_balance: fiat_wallet_balance,
+    fiat_wallet_currency: fiat_wallet_currency,
+    crypto_wallet_id: crypto_wallet_id,
+    crypto_wallet_balance: crypto_wallet_balance,
+    crypto_wallet_currency: crypto_wallet_currency,
+    email: email,
+    txn_client_name: txn_client_name,
+    txn_client_id: txn_client_id,
+    crypto_txn_fee: crypto_txn_fee,
+    crypto_txn_currency: crypto_txn_currency,
+    fiat_txn_fee: fiat_txn_fee,
+    fiat_txn_currency: fiat_txn_currency,
+    txn_type: txn_type,
+    txn_mode: txn_mode,
+    crypto_currency_type: crypto_currency_type
+  })
+
+	newTransaction.save().then((transaction) => {
+		res.send(transaction)
+	}).catch((err) => {
+		console.log(err)
+	})
+})
+
+
 // Updating the Transaction
 
 app.post('/update/:id', (req, res) => {
@@ -123,6 +475,6 @@ app.delete('/delete/:id', (req, res) => {
 })
 
 // Initialize the sever
-app.listen(6000, () => {
-    console.log('sever listening on port:6000');
+app.listen(8080, () => {
+    console.log('sever listening on port:8080');
 });
