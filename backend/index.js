@@ -2,9 +2,12 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const Transaction = require('./model/models')
+const cors = require('cors')
 
 //Initialize express app
 const app = express();
+
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -33,6 +36,7 @@ app.get('/', async(req, res) =>{
 // # BUNDLERS #  
 // Adding a Transaction for Utility token transfer using Bundlers to TransactionBook
 app.post('/transferUtility', (req, res) => {
+  console.log("HERE")
   console.log("user ID", req.body);
 	user_id = req.body.user_id,
 	fiat_wallet_id = req.body.fiat_wallet_id,

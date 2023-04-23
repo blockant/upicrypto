@@ -1,0 +1,22 @@
+.login-container {
+    width: 30vw;
+    margin: 25vh 0 25vh 0;
+    min-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: whitesmoke;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.login-container h1 {
+    text-align: center;
+    margin-top: 10vh;
+}
+
+.login-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15vh;
+}

@@ -1,0 +1,78 @@
+.payment-container {
+    background-color: #1C1717;
+    width: 35vw;
+    height: 100vh;
+    min-width: 400px;
+    padding: 1.5em;
+    color: whitesmoke;
+    box-sizing: border-box;
+}
+
+.payment-container h1 {
+    margin-top: 0;
+}
+
+.payment-details-container {
+    width: 100%;
+    margin-bottom: 3em;
+}
+
+.payment-container tr {
+    height: 2.5em;
+}
+
+.balance-container {
+    width: 100%;
+    border-width: 1;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.12);
+    border-bottom-width: thin;
+    border-radius: 1em;
+    margin-bottom: 3em;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.total-container {
+    width: 100%;
+    font-size: 0.9rem;
+    margin-bottom: 3em;
+}
+
+.alignLeft {
+    float: left;
+}
+
+.alignRight {
+    float: right;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+p {
+    margin: .4rem;
+}
+
+.payment-button-container {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.payment-method-item {
+    width: 100%;        
+    padding: 0 .3rem 0 .6rem;
+    border-bottom-style: solid;
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    box-sizing: border-box;
+}
+
+.payment-method-item:last-of-type {
+    border-bottom-width: 0;
+    border-bottom-style: none;
+}
+
+.MuiFormControlLabel-label {
+    width: 100%;
+}
