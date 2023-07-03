@@ -82,7 +82,7 @@ app.post('/transferUtility', (req, res) => {
 
 
 // Adding a Transaction for ERC20 transfer using Bundlers to TransactionBook
-app.post('/transferERC20', (req, res) => {
+app.post('/add', (req, res) => {
   console.log("user ID", req.body);
 	user_id = req.body.user_id,
 	fiat_wallet_id = req.body.fiat_wallet_id,
@@ -475,6 +475,6 @@ app.delete('/delete/:id', (req, res) => {
 })
 
 // Initialize the sever
-app.listen(8080, () => {
-    console.log('sever listening on port:8080');
+app.listen(3010, () => {
+    console.log('sever listening on port:3010');
 });
