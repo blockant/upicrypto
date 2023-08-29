@@ -24,6 +24,8 @@ import {ICreate2Deployer} from "./ICreate2Deployer.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager {
     using UserOperationLib for UserOperation;
+    event Here(string indexed message);
+    event OpLength(uint256 indexed length);
 
     SenderCreator private immutable senderCreator = new SenderCreator();
 
@@ -72,7 +74,9 @@ contract EntryPoint is IEntryPoint, StakeManager {
      * @param beneficiary the address to receive the fees
      */
     function handleOps(UserOperation[] calldata ops, address payable beneficiary) public {
+        emit Here("Here we are");
         uint256 opslen = ops.length;
+        emit OpLength(opslen);
         UserOpInfo[] memory opInfos = new UserOpInfo[](opslen);
 
         unchecked {
@@ -88,6 +92,10 @@ contract EntryPoint is IEntryPoint, StakeManager {
 
             _compensate(beneficiary, collected);
         } //unchecked
+    }
+
+    function haldleTest(UserOperation[] calldata ops, address payable beneficiary) public {
+        emit Here("Here we are");
     }
 
     /**
