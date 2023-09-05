@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
+require("dotenv").config();
 
-const privateKey =
-  "6d17286d5e09678c23c0fe7a95715146892c95294d1acd8fb399b53bdd14e9b2";
+const privateKey = process.env.POLYGON_PRIVATE_KEY;
 
 const provider = new ethers.providers.JsonRpcProvider(
   "https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8"
@@ -41,4 +41,3 @@ main()
     console.error(error);
     process.exit(1);
   });
-

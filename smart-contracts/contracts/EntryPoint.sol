@@ -74,7 +74,6 @@ contract EntryPoint is IEntryPoint, StakeManager {
      * @param beneficiary the address to receive the fees
      */
     function handleOps(UserOperation[] calldata ops, address payable beneficiary) public {
-        emit Here("Here we are");
         uint256 opslen = ops.length;
         emit OpLength(opslen);
         UserOpInfo[] memory opInfos = new UserOpInfo[](opslen);
