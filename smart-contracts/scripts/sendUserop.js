@@ -34,11 +34,11 @@ async function main() {
     "0xAa3bcBC78bc9d06CBA9355bf0dE0Dfd7D92957a0"
   );
 
-  const builder = new UserOperationBuilder().useDefaults({ sender });
-  console.log("Builder", builder);
-  // Build op with the middleware stack.
-  let userOp = await builder.buildOp(EntryPoint_Addr, 80001);
-  console.log("new userOp is ", userOp);
+  // const builder = new UserOperationBuilder().useDefaults({ sender });
+  // console.log("Builder", builder);
+  
+  // let userOp = await builder.buildOp(EntryPoint_Addr, 80001);
+  // console.log("new userOp is ", userOp);
 
   // Reset op back to default values when you're done.
   // builder.resetOp();
