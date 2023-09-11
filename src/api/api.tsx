@@ -44,17 +44,18 @@ export const paymentAPI = (amount: any): Promise<any> => {
 export const currencyAmountAPI = (): CurrencyAmount[] => {
   return [
     {
-      name: "Matic",
-      abbreviation: "MATIC",
-      sign: "MATIC",
-      amount: 4.3332,
-    },
-    {
       name: "Dollar",
       abbreviation: "USD",
       sign: "$",
       amount: 39.5,
     },
+    {
+      name: "Matic",
+      abbreviation: "MATIC",
+      sign: "MATIC",
+      amount: 4.3332,
+    },
+
     {
       name: "Etherium",
       abbreviation: "ETH",
