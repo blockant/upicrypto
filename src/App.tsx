@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+// import { loadStripe } from "@stripe/stripe-js";
 import "./App.css";
 import Payment, { PaymentFormProps } from "./payment/Payment";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -7,6 +8,7 @@ import Wallet from "./wallet/Wallet";
 import { Box, Drawer, Slide } from "@mui/material";
 import QRScannerComponent from "./qrScanner/QRScannerComponent";
 import CreateWallet from "./wallet/CreateWallet";
+import PaymentFiat from "./payment/PaymentFiat";
 
 const theme = createTheme({
   palette: {
@@ -28,6 +30,8 @@ const paymentFormDefaultProps: PaymentFormProps = {
 
 function App() {
   const [showPayment, setShowPayment] = useState<boolean>(false);
+  const [showPaymentFiat, setShowPaymentFiat] = useState<boolean>(false);
+
   const [showQRScanner, setShowQRScanner] = useState<boolean>(false);
   const [paymentFormProps, setPaymentFormProps] = useState<PaymentFormProps>(
     paymentFormDefaultProps
@@ -78,6 +82,17 @@ function App() {
     }
   };
 
+  const togglePaymentFiat = (show: boolean, action: string) => {
+    setShowPaymentFiat(show);
+    if (action === "SCAN_AND_PAY") {
+      // setPaymentFormProps(paymentFormScanAndPayProps);
+    } else {
+      setPaymentFormProps(paymentFormDefaultProps);
+    }
+  };
+  const onHandleTopup = (showPaymentFiat: boolean) => {
+    setShowPaymentFiat(showPaymentFiat);
+  };
   console.log("Updated profile is  ", profile);
 
   return (
@@ -96,6 +111,8 @@ function App() {
                 setShowPayment={togglePayment}
                 setShowQRScanner={setShowQRScanner}
                 walletAddress={walletAddress}
+                showPaymentFiat={showPaymentFiat}
+                onHandleTopup={onHandleTopup}
               />
             )}
           </>
@@ -122,18 +139,20 @@ function App() {
             paymentFormProps={paymentFormProps}
             showPayment={showPayment}
             closePayment={togglePayment}
+            walletAddress={walletAddress}
           />
         </Drawer>
         <Drawer
           anchor="right"
-          open={showPayment}
-          onClose={() => togglePayment(false, "")}
+          open={showPaymentFiat}
+          onClose={() => togglePaymentFiat(false, "")}
           ModalProps={{ keepMounted: false }}
         >
-          <Payment
+          <PaymentFiat
             paymentFormProps={paymentFormProps}
-            showPayment={showPayment}
-            closePayment={togglePayment}
+            showPayment={showPaymentFiat}
+            closePayment={togglePaymentFiat}
+            walletAddress={walletAddress}
           />
         </Drawer>
       </div>

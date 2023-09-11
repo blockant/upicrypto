@@ -32,6 +32,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import PaymentLoading from "./PaymentLoading";
 import PaymentStatus from "./PaymentStatus";
+import { loadStripe } from "@stripe/stripe-js";
 
 export interface CurrencyAmount {
   name: string;
@@ -84,7 +85,7 @@ interface PaymentProps {
   walletAddress: string;
 }
 
-const Payment = (props: PaymentProps) => {
+const PaymentFiat = (props: PaymentProps) => {
   const [payee, setPayee] = useState<string>(props.paymentFormProps.payee);
   const [currency, setCurrency] = useState<CurrencyAmount | undefined>();
   const [amount, setAmount] = useState<number>(props.paymentFormProps.amount);
@@ -103,49 +104,86 @@ const Payment = (props: PaymentProps) => {
   >();
   const [paymentStatus, setPaymentStatus] = useState<string>("IDLE");
 
-  async function handleAATransfer() {
+  // async function handleAATransfer() {
+  //   try {
+  //     console.log("Inside AA Transfer");
+  //     const body = {
+  //       recipientAddress: payee,
+  //       amountEth: amount,
+  //       sender: props.walletAddress,
+  //     };
+  //     const headers = {
+  //       "Content-Type": "application/json",
+  //     };
+
+  //     const response = await fetch(
+  //       "http://localhost:8000/execute-transaction",
+  //       {
+  //         method: "POST",
+  //         headers: headers,
+  //         body: JSON.stringify(body),
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     console.log(data.txHash);
+  //     if (data.txHash) {
+  //       setPaymentStatus("PAYMENT_SUCCESS");
+  //     } else {
+  //       setPaymentStatus("PAYMENT_FAILED");
+  //     }
+
+  //     // Assuming getWalletBalance is a function that returns a Promise and updates state
+  //     //   await getWalletBalance(walletAddress);
+  //     console.log(data.txHash);
+  //     return data.txHash;
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     throw error;
+  //   }
+  // }
+  const handleAddFiat = async () => {
     setPaymentStatus("LOADING");
+    console.log("Inside");
+    const stripe = await loadStripe(
+      "pk_test_51JBHmhSF8NnOLJjSzxttXK30JjAWSQdihSp5MhhvUJGneFMCVm1v0fH8kVnqtPRgT2kCVaSW6tCpYrwPyAo4s5rZ00YmoLsoPX"
+    );
+    const body = {
+      address: props.walletAddress,
+      amount: amount,
+    };
+    const headers = {
+      "Content-Type": "application/json",
+    };
 
-    try {
-      console.log("Inside AA Transfer");
-      const body = {
-        recipientAddress: payee,
-        amountEth: amount,
-        sender: props.walletAddress,
-      };
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      const response = await fetch(
-        "http://localhost:8000/execute-transaction",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(body),
-        }
-      );
-
-      const data = await response.json();
-      console.log(data.txHash);
-
-      if (data.txHash) {
-        setPaymentStatus("PAYMENT_SUCCESS");
-      } else {
-        setPaymentStatus("PAYMENT_FAILED");
+    const response = await fetch(
+      "http://localhost:8000/create-checkout-session",
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
       }
+    );
 
-      // Assuming getWalletBalance is a function that returns a Promise and updates state
-      //   await getWalletBalance(walletAddress);
-      console.log(data.txHash);
-      return data.txHash;
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
+    const session = await response.json();
+    console.log("Session", session);
+    let result;
+    if (stripe) {
+      result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
     }
-  }
+    // updateBalance(walletAddress);
+    setPaymentStatus("PAYMENT_SUCCESS");
 
-  console.log("Payment status", paymentStatus);
+    console.log("result is", result);
+
+    if (result && result.error) {
+      setPaymentStatus("PAYMENT_SUCCESS");
+    }
+    // setFiatBalance((prevBalance) => prevBalance + parseFloat(addFiatAmount));
+    // setAddFiatAmount("");
+  };
 
   useEffect(() => {
     const currencies: CurrencyAmount[] = currencyAmountAPI();
@@ -364,35 +402,6 @@ const Payment = (props: PaymentProps) => {
           <>
             <div className="payment-details-container">
               <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    id="payment-to"
-                    variant="outlined"
-                    label="Payee"
-                    fullWidth
-                    value={payee}
-                    size="small"
-                    onChange={handlePayeeChange}
-                    error={errorState.payeeError !== undefined}
-                    helperText={errorState.payeeError}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <FormControl fullWidth size="small">
-                    <Select
-                      id="currency-select"
-                      value={currency.abbreviation}
-                      onChange={handleCurrencyChange}
-                      readOnly={!props.paymentFormProps.isEditable}
-                    >
-                      {availableCurrency.map((curr) => (
-                        <MenuItem value={curr.abbreviation}>
-                          {curr.abbreviation}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
                 <Grid item xs={8}>
                   <TextField
                     id="payment-to"
@@ -427,39 +436,9 @@ const Payment = (props: PaymentProps) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={8}>
-                  <TextField
-                    id="transaction-charges-amount"
-                    variant="outlined"
-                    fullWidth
-                    value={transactionCharges === 0 ? "" : transactionCharges}
-                    label="Transaction Charge"
-                    size="small"
-                    inputProps={{ isEditable: false }}
-                    InputProps={{
-                      inputComponent: NumberFormatCustom,
-                    }}
-                    error={errorState.transactionChargesError !== undefined}
-                    helperText={errorState.transactionChargesError}
-                  />
-                </Grid>
               </Grid>
             </div>
-            <div className="balance-container">
-              <List disablePadding>
-                {availableCurrency.map((curr) => (
-                  <>
-                    <ListItem secondaryAction={renderBalanceCheck(curr)}>
-                      <ListItemText
-                        primary={curr.abbreviation}
-                        secondary={curr.amount}
-                      />
-                    </ListItem>
-                    <Divider />
-                  </>
-                ))}
-              </List>
-            </div>
+
             {/* <div className="total-container">
                         <List disablePadding>
                             <ListItem disablePadding>
@@ -477,7 +456,7 @@ const Payment = (props: PaymentProps) => {
                         </List>
                     </div> */}
             <div className="payment-button-container fullWidth">
-              <Button variant="contained" onClick={handleAATransfer}>
+              <Button variant="contained" onClick={handleAddFiat}>
                 Pay
               </Button>
             </div>
@@ -507,4 +486,4 @@ const Payment = (props: PaymentProps) => {
   );
 };
 
-export default Payment;
+export default PaymentFiat;

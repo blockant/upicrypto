@@ -10,6 +10,8 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import "./CreateWallet.css"; // Import the CSS module
 const walletStyle = {
   color: "whitesmoke",
@@ -115,7 +117,8 @@ const CreateWallet = (props: CreateWalletProps) => {
             className="card-form"
             style={{
               display: "flex",
-              padding: "10rem 15rem",
+              padding: "10rem 0rem",
+              justifyContent: "center",
             }}
           >
             <form onSubmit={handleSubmit}>
@@ -130,8 +133,15 @@ const CreateWallet = (props: CreateWalletProps) => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <button type="submit">Create</button>
+              <div
+                className="form-group"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                {loading ? (
+                  <CircularIndeterminate />
+                ) : (
+                  <button type="submit">Create</button>
+                )}
               </div>
             </form>
           </div>
@@ -142,3 +152,11 @@ const CreateWallet = (props: CreateWalletProps) => {
 };
 
 export default CreateWallet;
+
+function CircularIndeterminate() {
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CircularProgress />
+    </Box>
+  );
+}
