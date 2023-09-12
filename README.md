@@ -14,13 +14,36 @@ Also, it can be integration with many web3 platforms like gaming, social media w
 2. Social Login - Register through Gmail/Google Accounts / Social accounts Onboarding through OAuth2
 3. Passwordless authentication and authorisation - Link-based authentication through Gmail or SMS - Will use AWS SES for emails or mobile services for sending links through SMSs.
 
-# Deployed Contracts
+# Deployed Contracts 
+
+## Polygon Mumbai
 1. Paymaster Contract: https://mumbai.polygonscan.com/address/0xE6B255a6719f89BEE60dF0bcc971e49212Ff95F8#writeContract
 2. UpiCrypto SmartWallet Contract: https://mumbai.polygonscan.com/address/0x29C23DE681878F96435451e149570bb10ebE4CE1#writeContract
 3. EntryPoint Contract: https://mumbai.polygonscan.com/address/0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560#writeContract
 4. Delegate Payment Contract: https://mumbai.polygonscan.com/address/0x9afae241d8d7d268fff21c74c4eee319583d4458#writeContract
 5. MockERC20 Contract: https://mumbai.polygonscan.com/address/0x1dcd6c91cE4F12CD4e9969A047E43877ADE66A59#writeContract
 
+# Account Abstraction (EIP-4337)
+
+## Polygon zkEVM contracts
+EntryPoint: https://testnet-zkevm.polygonscan.com/address/0x340f2cd1253d2e5ed8087d4da1958a20d9e87684#code
+Smart Wallet: https://testnet-zkevm.polygonscan.com/address/0x0a678Df2dC9E7A288131bd7924b5d9026971c8F8#code
+Paymaster: https://testnet-zkevm.polygonscan.com/address/0xFEaB7800f9CE8dA3F936f19BC7C03b11dF7D1845#code
+Paymaster Token: https://goerli.lineascan.build/address/0x82BB132511196d92D1c9310D8Bb7bec3c9268D4a#code	
+Wallet Factory: https://goerli.lineascan.build/address/0xa6FbF91843396D5FEb7711A87c37F25A3E9E6Dbf#code	
+ERC20 Mock Token: https://goerli.lineascan.build/address/0x6265f71825Ce09F7544452109fb40a2521517238#code
+
+
+## Linea Smart Contracts
+EntryPoint: https://goerli.lineascan.build/address/0x0a678Df2dC9E7A288131bd7924b5d9026971c8F8#code	
+Smart Wallet: https://goerli.lineascan.build/address/0xFEaB7800f9CE8dA3F936f19BC7C03b11dF7D1845#code	
+Paymaster: https://goerli.lineascan.build/address/0x77c2686501FF82287558FE3c98424c074CA34E4A#code	
+Paymaster Token: https://goerli.lineascan.build/address/0x82BB132511196d92D1c9310D8Bb7bec3c9268D4a#code	
+Wallet Factory: https://goerli.lineascan.build/address/0xa6FbF91843396D5FEb7711A87c37F25A3E9E6Dbf#code	
+ERC20 Mock Token: https://goerli.lineascan.build/address/0x6265f71825Ce09F7544452109fb40a2521517238#code
+
+
+## Taiko Smart Contracts
 
 
 
