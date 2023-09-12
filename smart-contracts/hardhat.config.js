@@ -4,11 +4,15 @@ require("hardhat-contract-sizer");
 require("solidity-docgen");
 const dotenv = require("dotenv");
 dotenv.config({ path: __dirname + "/.env" });
-const { ALCHEMY_API_KEY, POLYGON_PRIVATE_KEY, POLYGONSCAN_API_KEY } =
+const { 
+  ALCHEMY_API_KEY, 
+  POLYGON_PRIVATE_KEY,
+  INFURA_API_KEY,
+  LINEA_PRIVATE_KEY
+ } =
   process.env;
 
 module.exports = {
-  // docgen: { ... },
   defaultNetwork: "hardhat",
   solidity: {
     version: "0.8.13",
@@ -25,26 +29,44 @@ module.exports = {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       accounts: [POLYGON_PRIVATE_KEY],
     },
-    // gnosis: { //Need xDAI
-    //   url: "https://rpc.gnosischain.com",
-    //   accounts: [GNOSIS_PRIVATE_KEY]
-    // },
-    // scroll_alpha_testnet : {
-    //   url: "https://alpha-rpc.scroll.io/l2",
-    //   accounts: [SCROLL_PRIVATE_KEY]
-    // },
-    // scroll_georli_testnet: {
-    //   url: "https://endpoints.omniatech.io/v1/eth/goerli/public",
-    //   accounts: [SCROLL_PRIVATE_KEY]
-    // },
-    // georli_optimism_testnet: {
-    //   url: "https://goerli.optimism.io",
-    //   accounts: [OPTIMISM_PRIVATE_KEY]
-    // }
-  },
-  etherscan: {
-    apiKey: {
-      polygonMumbai: POLYGONSCAN_API_KEY,
+    zkEVM:{
+      url: `https://rpc.public.zkevm-test.net`,
+      accounts: [POLYGON_PRIVATE_KEY],
+    },
+    ziliqaTestnet:{
+      url: `https://dev-api.zilliqa.com`,
+      accounts: [POLYGON_PRIVATE_KEY],
+    },
+    lineaTestnet: {
+      url: `https://linea-goerli.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [LINEA_PRIVATE_KEY],
+    },
+    taikoTestnet:{
+      url: `https://rpc.test.taiko.xyz`,
+      accounts: [POLYGON_PRIVATE_KEY],
     },
   },
+  etherscan :{
+    apiKey: {
+      // polygonMumbai: POLYGONSCAN_API_KEY,
+      // zkEVM: "JMWIV8P7XEJUH7J87YMQ5NBNR2JA3XHF3S",
+      lineaTestnet: '5QWDTVPDD9GU8WUU2RR15TUHIMUKWZZ9XY',
+    }
+  }
+  // taiko
+  // etherscan: {
+  //   apiKey: {
+  //     taiko: "42069",
+  // },
+  // customChains: [
+  //     {
+  //         network: "taiko",
+  //         chainId: 167005,
+  //         urls: {
+  //             apiURL: "https://explorer.test.taiko.xyz/api",
+  //             browserURL: "https://explorer.test.taiko.xyz",
+  //         },
+  //     },
+  // ],
+  // },
 };

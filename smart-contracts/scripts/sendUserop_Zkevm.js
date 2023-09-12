@@ -1,17 +1,15 @@
 const { ethers } = require("hardhat");
 require("dotenv").config();
 
-const smartWalletABI =
-  require("../artifacts/contracts/SmartWallet.sol/SmartWallet.json").abi;
+const smartWalletABI = require("../artifacts/contracts/SmartWallet.sol/SmartWallet.json").abi;
 
 async function main() {
- 
-  const benificiaryAddress = "0x1781dD58E10698Ce327d493771F7Ba9E5B394BF2";
-  const receiverAddr = "0xb34cDe61a284205ffeD6Baf0b06F0445336631DC";
-  const EntryPoint_Addr = "0x1781dD58E10698Ce327d493771F7Ba9E5B394BF2"; //"0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"; //"0x1781dD58E10698Ce327d493771F7Ba9E5B394BF2";
+  const benificiaryAddress = "0x340F2CD1253D2E5Ed8087D4Da1958a20d9E87684";
+  const receiverAddr = "0x41Eb71f017503327EcAAD2E4F6f05C3B962538B7";
+  const EntryPoint_Addr = "0x340F2CD1253D2E5Ed8087D4Da1958a20d9E87684";
   const privateKey = process.env.POLYGON_PRIVATE_KEY;
 
-  const sender = "0xAa3bcBC78bc9d06CBA9355bf0dE0Dfd7D92957a0";
+  const sender = "0x4276438aCd46880E1d80AbB5A83c8cB37361030F"; //computed address
   // const nonce = "0";
   const callGasLimit = "1000000";
   const verificationGasLimit = "200000";
@@ -19,7 +17,7 @@ async function main() {
   const maxFeePerGas = "10000000000";
   const maxPriorityFeePerGas = "10000000000";
   const smartAccount = new ethers.utils.Interface(smartWalletABI);
-  const amount = ethers.utils.parseEther("0.01");
+  const amount = ethers.utils.parseEther("0.0001");
   console.log("Amount", amount);
 
   const calldata = smartAccount.encodeFunctionData("executeFromEntryPoint", [
@@ -29,7 +27,7 @@ async function main() {
   ]);
   const smartwallet = await ethers.getContractAt(
     "SmartWallet",
-    "0xAa3bcBC78bc9d06CBA9355bf0dE0Dfd7D92957a0"
+    "0x4276438aCd46880E1d80AbB5A83c8cB37361030F"
   );
 
   const nonce = await smartwallet.nonce();
@@ -65,7 +63,7 @@ async function main() {
   console.log("Arraified hash", arraifiedHash);
 
   const provider = new ethers.providers.JsonRpcProvider(
-    "https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8"
+    "https://rpc.public.zkevm-test.net"
   );
   const wallet = new ethers.Wallet(privateKey, provider);
 
@@ -94,12 +92,11 @@ async function main() {
   console.log("UserOp", userOperations);
 
   // const EntryPoint = await ethers.getContractAt("EntryPoint", EntryPoint_Addr);
-
   try {
     const tx = await EntryPoint.connect(wallet).handleOps(
       userOperations,
       benificiaryAddress,
-      { gasLimit: 15000000 }
+      { gasLimit: 150000000 }
     );
     await tx.wait();
     console.log("Transaction:",tx)
@@ -114,3 +111,4 @@ main()
     console.error(error);
     process.exit(1);
   });
+

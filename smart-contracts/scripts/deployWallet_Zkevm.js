@@ -4,29 +4,22 @@ require("dotenv").config();
 const privateKey = process.env.POLYGON_PRIVATE_KEY;
 
 const provider = new ethers.providers.JsonRpcProvider(
-  "https://linea-goerli.infura.io/v3/c5481ef9dd88453492aa84ccd297f474"
+  "https://rpc.public.zkevm-test.net"
 );
 const wallet = new ethers.Wallet(privateKey, provider);
 
 async function main() {
   const deployer = wallet;
 
-  const factoryAddress = "0xa6FbF91843396D5FEb7711A87c37F25A3E9E6Dbf";
-  const entryPoint = "0x0a678Df2dC9E7A288131bd7924b5d9026971c8F8";
+  const factoryAddress = "0x82BB132511196d92D1c9310D8Bb7bec3c9268D4a";
+  const entryPoint = "0x340F2CD1253D2E5Ed8087D4Da1958a20d9E87684";
   const walletOwner = deployer.address;
-
+  console.log("Wallet address", walletOwner);
   const salt = 1;
 
   const factory = await ethers.getContractAt("WalletFactory", factoryAddress);
-  // console.log("factory address", factory);
-  
-  const gasPrice = ethers.utils.parseUnits('1', 'gwei'); // Replace with your desired gas price in Gwei
-  const gasLimit = 3000000; // Replace with your desired gas limit
 
-  const deployTx = await factory.deployWallet(entryPoint, walletOwner, salt, {
-    gasPrice: gasPrice,
-    gasLimit: gasLimit, // Specify the gas limit here
-  });
+  const deployTx = await factory.deployWallet(entryPoint, walletOwner, salt);
   await deployTx.wait();
 
   const computedAddress = await factory.computeAddress(
@@ -37,6 +30,7 @@ async function main() {
 
   console.log(
     "Wallet deployed and computed address:",
+
     computedAddress
   );
 }

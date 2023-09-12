@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 
 async function main() {
-    const OWNER="0x41Eb71f017503327EcAAD2E4F6f05C3B962538B7"
+    const OWNER="0x566E21aFE80E341A2B542A7a1d068202c3b9dD69"
 
     const EntryPointC = await hre.ethers.getContractFactory("EntryPoint");
     const entryPoint = await EntryPointC.deploy();

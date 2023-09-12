@@ -93,10 +93,6 @@ contract EntryPoint is IEntryPoint, StakeManager {
         } //unchecked
     }
 
-    function haldleTest(UserOperation[] calldata ops, address payable beneficiary) public {
-        emit Here("Here we are");
-    }
-
     /**
      * Execute a batch of UserOperation with Aggregators
      * @param opsPerAggregator the operations to execute, grouped by aggregator (or address(0) for no-aggregator accounts)
