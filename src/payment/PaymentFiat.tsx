@@ -83,6 +83,7 @@ interface PaymentProps {
   closePayment: (show: boolean, action: string) => void;
   paymentFormProps: PaymentFormProps;
   walletAddress: string;
+  network: string;
 }
 
 const PaymentFiat = (props: PaymentProps) => {
@@ -186,27 +187,35 @@ const PaymentFiat = (props: PaymentProps) => {
   };
 
   useEffect(() => {
-    const currencies: CurrencyAmount[] = currencyAmountAPI();
-    setAvailableCurrency(currencies);
-    if (!props.paymentFormProps.currency) {
-      setCurrency(currencies[0]);
-    } else {
-      setCurrency(
-        currencies.filter(
-          (curr) => curr.abbreviation === props.paymentFormProps.currency
-        )[0]
-      );
-    }
-    if (!props.paymentFormProps.transactionCurrency) {
-      setTransactionCurrency(currencies[0]);
-    } else {
-      setTransactionCurrency(
-        currencies.filter(
-          (curr) =>
-            curr.abbreviation === props.paymentFormProps.transactionCurrency
-        )[0]
-      );
-    }
+    currencyAmountAPI(props.network, props.walletAddress).then(
+      (currencies: CurrencyAmount[]) => {
+        setAvailableCurrency(currencies);
+
+        if (!props.paymentFormProps.currency) {
+          setCurrency(
+            currencies.filter(
+              (curr) => curr.abbreviation === "USD" //props.paymentFormProps.currency
+            )[0]
+          );
+        } else {
+          setCurrency(
+            currencies.filter(
+              (curr) => curr.abbreviation === "USD" //props.paymentFormProps.currency
+            )[0]
+          );
+        }
+        if (!props.paymentFormProps.transactionCurrency) {
+          setTransactionCurrency(currencies[0]);
+        } else {
+          setTransactionCurrency(
+            currencies.filter(
+              (curr) =>
+                curr.abbreviation === props.paymentFormProps.transactionCurrency
+            )[0]
+          );
+        }
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -249,7 +258,7 @@ const PaymentFiat = (props: PaymentProps) => {
   const handleTransactionCurrencyChange = (event: any) => {
     const selectedCurrency: string = event.target.value;
     setTransactionCurrency(
-      availableCurrency.find((curr) => curr.abbreviation === selectedCurrency)
+      availableCurrency.find((curr) => curr.abbreviation === "USD")
     );
   };
 
@@ -457,7 +466,7 @@ const PaymentFiat = (props: PaymentProps) => {
                     </div> */}
             <div className="payment-button-container fullWidth">
               <Button variant="contained" onClick={handleAddFiat}>
-                Pay
+                Add Balance
               </Button>
             </div>
           </>

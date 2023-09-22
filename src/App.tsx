@@ -38,6 +38,7 @@ function App() {
   );
   const [profile, setProfile] = useState<any>();
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [network, setAppNetwork] = useState<string>("Polygon");
 
   useEffect(() => {
     if (showPayment) setShowQRScanner(false);
@@ -113,6 +114,7 @@ function App() {
                 walletAddress={walletAddress}
                 showPaymentFiat={showPaymentFiat}
                 onHandleTopup={onHandleTopup}
+                setAppNetwork={setAppNetwork}
               />
             )}
           </>
@@ -140,6 +142,7 @@ function App() {
             showPayment={showPayment}
             closePayment={togglePayment}
             walletAddress={walletAddress}
+            network={network}
           />
         </Drawer>
         <Drawer
@@ -153,6 +156,7 @@ function App() {
             showPayment={showPaymentFiat}
             closePayment={togglePaymentFiat}
             walletAddress={walletAddress}
+            network={network}
           />
         </Drawer>
       </div>

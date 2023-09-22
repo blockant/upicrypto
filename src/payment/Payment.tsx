@@ -82,6 +82,7 @@ interface PaymentProps {
   closePayment: (show: boolean, action: string) => void;
   paymentFormProps: PaymentFormProps;
   walletAddress: string;
+  network: string;
 }
 
 const Payment = (props: PaymentProps) => {
@@ -146,29 +147,34 @@ const Payment = (props: PaymentProps) => {
   }
 
   console.log("Payment status", paymentStatus);
+  console.log("CURRENCY", availableCurrency);
 
   useEffect(() => {
-    const currencies: CurrencyAmount[] = currencyAmountAPI();
-    setAvailableCurrency(currencies);
-    if (!props.paymentFormProps.currency) {
-      setCurrency(currencies[0]);
-    } else {
-      setCurrency(
-        currencies.filter(
-          (curr) => curr.abbreviation === props.paymentFormProps.currency
-        )[0]
-      );
-    }
-    if (!props.paymentFormProps.transactionCurrency) {
-      setTransactionCurrency(currencies[0]);
-    } else {
-      setTransactionCurrency(
-        currencies.filter(
-          (curr) =>
-            curr.abbreviation === props.paymentFormProps.transactionCurrency
-        )[0]
-      );
-    }
+    currencyAmountAPI(props.network, props.walletAddress).then(
+      (currencies: CurrencyAmount[]) => {
+        setAvailableCurrency(currencies);
+
+        if (!props.paymentFormProps.currency) {
+          setCurrency(currencies[0]);
+        } else {
+          setCurrency(
+            currencies.filter(
+              (curr) => curr.abbreviation === props.paymentFormProps.currency
+            )[0]
+          );
+        }
+        if (!props.paymentFormProps.transactionCurrency) {
+          setTransactionCurrency(currencies[0]);
+        } else {
+          setTransactionCurrency(
+            currencies.filter(
+              (curr) =>
+                curr.abbreviation === props.paymentFormProps.transactionCurrency
+            )[0]
+          );
+        }
+      }
+    );
   }, []);
 
   useEffect(() => {

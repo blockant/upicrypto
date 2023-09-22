@@ -30,6 +30,8 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { string } from "prop-types";
 import { ethers } from "ethers";
 import { ConstructionOutlined } from "@mui/icons-material";
+import { CurrencyAmount } from "../payment/PaymentFiat";
+import { currencyAmountAPI } from "../api/api";
 const walletStyle = {
   color: "whitesmoke",
   width: "70vw",
@@ -54,6 +56,7 @@ interface WalletProps {
   walletAddress: string;
   onHandleTopup: (fiatPayment: boolean) => void;
   showPaymentFiat: boolean;
+  setAppNetwork: Dispatch<SetStateAction<string>>;
 }
 
 interface CheckListProps {
@@ -77,11 +80,15 @@ interface NetworkData {
 }
 const Wallet = (props: WalletProps) => {
   const [wallet, setWallet] = useState();
+  const [cryptoTransactions, setCryptoTransactions] = useState<object>([]);
   const [maticBalance, setMaticBalance] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [network, setNetwork] = useState<string>("Polygon");
   const [fiatBalance, setFiatBalance] = useState<number>(0);
+  const [availableCurrency, setAvailableCurrency] = useState<CurrencyAmount[]>(
+    []
+  );
 
   const networkOptions: Record<string, { name: string; symbol: string }> = {
     Ethereum: { name: "Ethereum", symbol: "ETH" },
@@ -109,6 +116,22 @@ const Wallet = (props: WalletProps) => {
 
       return null;
     }
+  }
+  async function getNonZeroValueTransactions() {
+    const provider = new ethers.providers.EtherscanProvider("maticmum");
+    console.log("Provoder is ", provider);
+
+    const history = await provider.getHistory(props.walletAddress);
+
+    const nonZeroValueTransactions = history.filter((tx) => {
+      const value = ethers.utils.parseEther(tx.value.toString());
+      return !value.isZero();
+    });
+
+    console.log("NON value transactions ", nonZeroValueTransactions);
+    setCryptoTransactions(nonZeroValueTransactions);
+
+    // return nonZeroValueTransactions;
   }
   async function getMaticPrice() {
     try {
@@ -210,6 +233,14 @@ const Wallet = (props: WalletProps) => {
     }
   };
   useEffect(() => {
+    getNonZeroValueTransactions();
+    currencyAmountAPI(network, props.walletAddress).then(
+      (currencies: CurrencyAmount[]) => {
+        setAvailableCurrency(currencies);
+      }
+    );
+
+    props.setAppNetwork(network);
     getMaticPrice();
     updateBalance(props.walletAddress);
     const tokenBalancesPromise = getTokenBalances(props.walletAddress);
