@@ -33,6 +33,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import PaymentLoading from "./PaymentLoading";
 import PaymentStatus from "./PaymentStatus";
 import { loadStripe } from "@stripe/stripe-js";
+import StripeCheckout from "react-stripe-checkout";
 
 export interface CurrencyAmount {
   name: string;
@@ -143,7 +144,49 @@ const PaymentFiat = (props: PaymentProps) => {
   //     throw error;
   //   }
   // }
-  const handleAddFiat = async () => {
+  // const handleAddFiat = async () => {
+  //   setPaymentStatus("LOADING");
+  //   console.log("Inside");
+  //   const stripe = await loadStripe(
+  //     "pk_test_51JBHmhSF8NnOLJjSzxttXK30JjAWSQdihSp5MhhvUJGneFMCVm1v0fH8kVnqtPRgT2kCVaSW6tCpYrwPyAo4s5rZ00YmoLsoPX"
+  //   );
+  //   const body = {
+  //     address: props.walletAddress,
+  //     amount: amount,
+  //   };
+  //   const headers = {
+  //     "Content-Type": "application/json",
+  //   };
+
+  //   const response = await fetch(
+  //     "http://localhost:8000/create-checkout-session",
+  //     {
+  //       method: "POST",
+  //       headers: headers,
+  //       body: JSON.stringify(body),
+  //     }
+  //   );
+
+  //   const session = await response.json();
+  //   console.log("Session", session);
+  //   let result;
+  //   if (stripe) {
+  //     result = await stripe.redirectToCheckout({
+  //       sessionId: session.id,
+  //     });
+  //   }
+  //   // updateBalance(walletAddress);
+  //   setPaymentStatus("PAYMENT_SUCCESS");
+
+  //   console.log("result is", result);
+
+  //   if (result && result.error) {
+  //     setPaymentStatus("PAYMENT_SUCCESS");
+  //   }
+  //   // setFiatBalance((prevBalance) => prevBalance + parseFloat(addFiatAmount));
+  //   // setAddFiatAmount("");
+  // };
+  const handleAddFiat = async (token: any) => {
     setPaymentStatus("LOADING");
     console.log("Inside");
     const stripe = await loadStripe(
@@ -152,36 +195,35 @@ const PaymentFiat = (props: PaymentProps) => {
     const body = {
       address: props.walletAddress,
       amount: amount,
+      token: token,
     };
     const headers = {
       "Content-Type": "application/json",
     };
 
-    const response = await fetch(
-      "http://localhost:8000/create-checkout-session",
-      {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(body),
-      }
-    );
-
-    const session = await response.json();
-    console.log("Session", session);
+    const response = await fetch("http://localhost:8000/payment", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body),
+    });
     let result;
-    if (stripe) {
-      result = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
+
+    result = await response.json();
+    console.log("Session", result);
+    if (result && result.error) {
+      setPaymentStatus("PAYMENT_SUCCESS");
     }
+
+    //  if (stripe) {
+    //    result = await stripe.redirectToCheckout({
+    //      sessionId: session.id,
+    //    });
+    //  }
     // updateBalance(walletAddress);
     setPaymentStatus("PAYMENT_SUCCESS");
 
     console.log("result is", result);
 
-    if (result && result.error) {
-      setPaymentStatus("PAYMENT_SUCCESS");
-    }
     // setFiatBalance((prevBalance) => prevBalance + parseFloat(addFiatAmount));
     // setAddFiatAmount("");
   };
@@ -465,9 +507,17 @@ const PaymentFiat = (props: PaymentProps) => {
                         </List>
                     </div> */}
             <div className="payment-button-container fullWidth">
-              <Button variant="contained" onClick={handleAddFiat}>
+              <StripeCheckout
+                stripeKey="pk_test_51JBHmhSF8NnOLJjSzxttXK30JjAWSQdihSp5MhhvUJGneFMCVm1v0fH8kVnqtPRgT2kCVaSW6tCpYrwPyAo4s5rZ00YmoLsoPX"
+                token={handleAddFiat}
+                name="Add Fiat"
+                amount={amount * 100}
+              />
+              {/* <Button variant="contained">Add Balance</Button>
+              </StripeCheckout> */}
+              {/* <Button variant="contained" onClick={handleAddFiat}>
                 Add Balance
-              </Button>
+              </Button> */}
             </div>
           </>
         );

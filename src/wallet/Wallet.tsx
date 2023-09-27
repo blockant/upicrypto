@@ -63,11 +63,102 @@ interface CheckListProps {
   setShowPayment: (show: boolean, action: string) => void;
   tokens: TokenData[];
 }
-
+interface CheckListProps2 {
+  setShowPayment: (show: boolean, action: string) => void;
+  tokens: ChargeData[];
+}
 interface TokenData {
   name: string;
   symbol: string;
   balance: string;
+}
+interface ChargeData {
+  // name: string;
+  // symbol: string;
+  // balance: string;
+  id: "ch_3NueZXSF8NnOLJjS07yQgUeL";
+  object: "charge";
+  amount: number;
+  amount_captured: 47500;
+  amount_refunded: 0;
+  application: null;
+  application_fee: null;
+  application_fee_amount: null;
+  balance_transaction: "txn_3NueZXSF8NnOLJjS08Ce8pjL";
+  billing_details: {
+    address: [Object];
+    email: null;
+    name: "gurjarritesh155@gmail.com";
+    phone: null;
+  };
+  calculated_statement_descriptor: "Stripe";
+  captured: true;
+  created: 1695747439;
+  currency: "inr";
+  customer: "cus_Oi4eydBqcYLvkc";
+  description: "Adding Funds";
+  destination: null;
+  dispute: null;
+  disputed: false;
+  failure_balance_transaction: null;
+  failure_code: null;
+  failure_message: null;
+  fraud_details: {};
+  invoice: null;
+  livemode: false;
+  metadata: {};
+  on_behalf_of: null;
+  order: null;
+  outcome: {
+    network_status: "approved_by_network";
+    reason: null;
+    risk_level: "normal";
+    risk_score: 45;
+    seller_message: "Payment complete.";
+    type: "authorized";
+  };
+  paid: true;
+  payment_intent: null;
+  payment_method: "card_1NueV9SF8NnOLJjSuPK4JteU";
+  payment_method_details: { card: [Object]; type: "card" };
+  receipt_email: "gurjarritesh155@gmail.com";
+  receipt_number: null;
+  receipt_url: "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xSkJIbWhTRjhObk9MSmpTKIWzzKgGMgYaOPrab306LBatN5TfidcOE5aNAvWhmZWxCJA_N7e9fJ6OaA9cl5iYb1nKbcxMgWJTW_3H";
+  refunded: false;
+  review: null;
+  shipping: null;
+  source: {
+    id: "card_1NueV9SF8NnOLJjSuPK4JteU";
+    object: "card";
+    address_city: null;
+    address_country: null;
+    address_line1: null;
+    address_line1_check: null;
+    address_line2: null;
+    address_state: null;
+    address_zip: null;
+    address_zip_check: null;
+    brand: "MasterCard";
+    country: "US";
+    customer: "cus_Oi4eydBqcYLvkc";
+    cvc_check: "pass";
+    dynamic_last4: null;
+    exp_month: 12;
+    exp_year: 2026;
+    fingerprint: "7TaK6QMOgaLNWeEN";
+    funding: "credit";
+    last4: "4444";
+    metadata: {};
+    name: "gurjarritesh155@gmail.com";
+    tokenization_method: null;
+    wallet: null;
+  };
+  source_transfer: null;
+  statement_descriptor: null;
+  statement_descriptor_suffix: null;
+  status: "succeeded";
+  transfer_data: null;
+  transfer_group: string;
 }
 // interface SubTokenData {
 //   name: string;
@@ -89,6 +180,7 @@ const Wallet = (props: WalletProps) => {
   const [availableCurrency, setAvailableCurrency] = useState<CurrencyAmount[]>(
     []
   );
+  const [charges, setCharges] = useState<ChargeData[]>([]);
 
   const networkOptions: Record<string, { name: string; symbol: string }> = {
     Ethereum: { name: "Ethereum", symbol: "ETH" },
@@ -101,7 +193,7 @@ const Wallet = (props: WalletProps) => {
     try {
       console.log("inside update fiat balance ", walletAddress);
       const response = await fetch(
-        `http://localhost:8000/get-wallet-balance/${walletAddress}`
+        `http://localhost:8000/get-wallet-balance-new/${walletAddress}`
       );
 
       if (!response.ok) {
@@ -113,6 +205,27 @@ const Wallet = (props: WalletProps) => {
       console.log("Wallet balance ", data.balance);
     } catch (error) {
       console.error("Error checking and updating balance:", error);
+
+      return null;
+    }
+  }
+
+  async function getCharges(walletAddress: string) {
+    try {
+      console.log("inside update fiat balance ", walletAddress);
+      const response = await fetch(
+        `http://localhost:8000/get-charges-new/${walletAddress}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch charges");
+      }
+
+      const data = await response.json();
+      setCharges(data.allCharges); // Assuming setFiatBalance is a function that updates state
+      console.log("Wallet charges ARE HERE ", data.allCharges);
+    } catch (error) {
+      console.error("Error getting charges:", error);
 
       return null;
     }
@@ -243,6 +356,7 @@ const Wallet = (props: WalletProps) => {
     props.setAppNetwork(network);
     getMaticPrice();
     updateBalance(props.walletAddress);
+    getCharges(props.walletAddress);
     const tokenBalancesPromise = getTokenBalances(props.walletAddress);
 
     tokenBalancesPromise
@@ -324,7 +438,7 @@ const Wallet = (props: WalletProps) => {
       </Grid>
       <Divider />
       <Grid item xs={12}>
-        <Box
+        {/* <Box
           sx={{
             fontSize: "1.2rem",
             display: "flex",
@@ -344,6 +458,49 @@ const Wallet = (props: WalletProps) => {
           >
             Top up
           </Button>
+        </Box> */}
+        <Box
+          sx={{
+            paddingY: "10px",
+            width: "50%",
+            margin: "auto",
+          }}
+        >
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Box
+                sx={{
+                  fontSize: "1.2rem",
+                  display: "flex",
+                  justifyContent: "center",
+                  paddingY: "10px",
+                }}
+              >
+                <div style={{ padding: "0 10px" }}>Fiat Balance</div>
+                <div style={{ padding: "0 10px" }}>{fiatBalance} USD</div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ padding: "0 10px" }}
+                  onClick={() => {
+                    props.onHandleTopup(!props.showPaymentFiat);
+                  }}
+                >
+                  Top up
+                </Button>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <CheckboxListSecondary2
+                tokens={charges}
+                setShowPayment={props.setShowPayment}
+              />
+            </AccordionDetails>
+          </Accordion>
         </Box>
         <Box
           sx={{
@@ -467,6 +624,61 @@ function CheckboxListSecondary(props: CheckListProps) {
   );
 }
 
+function CheckboxListSecondary2(props: CheckListProps2) {
+  const { setShowPayment, tokens } = props;
+  const [checked, setChecked] = useState<Array<Number>>([1]);
+
+  const handleToggle = (value: number) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
+
+  return (
+    <List sx={{ width: "100%" }}>
+      {props.tokens.map((value) => {
+        const labelId = `checkbox-list-secondary-label-Send}`;
+        return (
+          <ListItem
+            key={value.amount}
+            //secondaryAction={
+            // <Button
+            //   variant="contained"
+            //   color="primary"
+            //   style={{ padding: "0 10px" }}
+            //   onClick={() => {
+            //     setShowPayment(true, "PAY");
+            //   }}
+            // >
+            //   send
+            // </Button>
+            //}
+            disablePadding
+          >
+            <ListItemButton>
+              <ListItemAvatar>
+                <ListItemText id={labelId} primary={`Added`} />
+                {/* <Avatar
+                  alt={`Avatar n°${value}`}
+                  src={`/static/images/avatar/${value}.jpg`}
+                /> */}
+              </ListItemAvatar>
+              <ListItemText id={labelId} primary={`IN`} />
+              <ListItemText id={labelId} primary={`${value.amount/100} $`} />
+            </ListItemButton>
+          </ListItem>
+        );
+      })}
+    </List>
+  );
+}
 const NetworkOptions = (props: NetworkData) => {
   const handleChange = (event: SelectChangeEvent) => {
     props.setNetwork(event.target.value);
