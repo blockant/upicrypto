@@ -32,6 +32,40 @@ import { ethers } from "ethers";
 import { ConstructionOutlined } from "@mui/icons-material";
 import { CurrencyAmount } from "../payment/PaymentFiat";
 import { currencyAmountAPI } from "../api/api";
+import SwipeableViews from "react-swipeable-views";
+import { useTheme } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
+import Menu from "@mui/material/Menu";
+
+import ListItemIcon from "@mui/material/ListItemIcon";
+
+import IconButton from "@mui/material/IconButton";
+
+import Tooltip from "@mui/material/Tooltip";
+import PersonAdd from "@mui/icons-material/PersonAdd";
+import Settings from "@mui/icons-material/Settings";
+import Logout from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PublicIcon from "@mui/icons-material/Public";
+import HelpIcon from "@mui/icons-material/Help";
+import FeedbackIcon from "@mui/icons-material/Feedback";
+import Modal from "@mui/material/Modal";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+const modalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 700,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  color: "white",
+};
 const walletStyle = {
   color: "whitesmoke",
   width: "70vw",
@@ -52,6 +86,7 @@ const walletStyle = {
 interface WalletProps {
   setShowPayment: (show: boolean, action: string) => void;
   profile: any;
+  setProfile: Dispatch<SetStateAction<any>>;
   setShowQRScanner: Dispatch<SetStateAction<boolean>>;
   walletAddress: string;
   onHandleTopup: (fiatPayment: boolean) => void;
@@ -181,6 +216,7 @@ const Wallet = (props: WalletProps) => {
     []
   );
   const [charges, setCharges] = useState<ChargeData[]>([]);
+  const [value, setValue] = React.useState(0);
 
   const networkOptions: Record<string, { name: string; symbol: string }> = {
     Ethereum: { name: "Ethereum", symbol: "ETH" },
@@ -189,11 +225,37 @@ const Wallet = (props: WalletProps) => {
     Kovan: { name: "Kovan", symbol: "ETH" },
   };
 
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+  const theme = useTheme();
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  function handleLogout() {
+    props.setProfile(null);
+  }
+
+  const handleChangeIndex = (index: number) => {
+    setValue(index);
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   async function updateBalance(walletAddress: string) {
     try {
       console.log("inside update fiat balance ", walletAddress);
       const response = await fetch(
-        `http://localhost:8000/get-wallet-balance-new/${walletAddress}`
+        `http://localhost:8000/get-wallet-balance/${walletAddress}`
       );
 
       if (!response.ok) {
@@ -424,6 +486,127 @@ const Wallet = (props: WalletProps) => {
             >
               <NetworkOptions setNetwork={setNetwork} network={network} />
             </Box>
+            <React.Fragment>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                {/* <Typography sx={{ minWidth: 100 }}>Contact</Typography>
+              <Typography sx={{ minWidth: 100 }}>Profile</Typography> */}
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClick}
+                    size="small"
+                    sx={{ ml: 2 }}
+                    aria-controls={open ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                  >
+                    <AccountCircleIcon sx={{ width: 32, height: 32 }} />
+                    {/* <Avatar sx={{ width: 32, height: 32 }}>
+                    <AccountCircleIcon sx={{ width: 32, height: 32 }} />
+                  </Avatar> */}
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Menu
+                anchorEl={anchorEl}
+                id="account-menu"
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&:before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                {/* <MenuItem onClick={handleClose}>
+                  <Avatar /> Profile
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <Avatar /> My account
+                </MenuItem>
+                <Divider /> */}
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <PersonAdd fontSize="small" />
+                  </ListItemIcon>
+                  Aaccount
+                </MenuItem>
+                <MenuItem onClick={handleOpenModal}>
+                  <ListItemIcon>
+                    <PublicIcon fontSize="small" />
+                  </ListItemIcon>
+                  My public Address
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <ArrowCircleUpIcon fontSize="small" />
+                  </ListItemIcon>
+                  Preferences
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <HelpIcon fontSize="small" />
+                  </ListItemIcon>
+                  Get Help
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <FeedbackIcon fontSize="small" />
+                  </ListItemIcon>
+                  Feedback
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </Menu>
+            </React.Fragment>
+            <Modal
+              open={openModal}
+              onClose={handleCloseModal}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={modalStyle}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Public Address
+                </Typography>
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  {props.walletAddress}
+                </Typography>
+              </Box>
+            </Modal>
           </Box>
         </Grid>
         <Grid item xs={12}>
@@ -459,83 +642,106 @@ const Wallet = (props: WalletProps) => {
             Top up
           </Button>
         </Box> */}
-        <Box
-          sx={{
-            paddingY: "10px",
-            width: "50%",
-            margin: "auto",
-          }}
+        <AppBar position="static">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="secondary"
+            textColor="inherit"
+            variant="fullWidth"
+            aria-label="full width tabs example"
+          >
+            <Tab label="Fiat" {...a11yProps(0)} />
+            <Tab label="Crypto" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
+        <SwipeableViews
+          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          index={value}
+          onChangeIndex={handleChangeIndex}
         >
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+          <TabPanel value={value} index={0} dir={theme.direction}>
+            <Box
+              sx={{
+                paddingY: "10px",
+                width: "50%",
+                margin: "auto",
+              }}
             >
-              <Box
-                sx={{
-                  fontSize: "1.2rem",
-                  display: "flex",
-                  justifyContent: "center",
-                  paddingY: "10px",
-                }}
-              >
-                <div style={{ padding: "0 10px" }}>Fiat Balance</div>
-                <div style={{ padding: "0 10px" }}>{fiatBalance} USD</div>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ padding: "0 10px" }}
-                  onClick={() => {
-                    props.onHandleTopup(!props.showPaymentFiat);
-                  }}
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
                 >
-                  Top up
-                </Button>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <CheckboxListSecondary2
-                tokens={charges}
-                setShowPayment={props.setShowPayment}
-              />
-            </AccordionDetails>
-          </Accordion>
-        </Box>
-        <Box
-          sx={{
-            paddingY: "10px",
-            width: "50%",
-            margin: "auto",
-          }}
-        >
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+                  <Box
+                    sx={{
+                      fontSize: "1.2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingY: "10px",
+                    }}
+                  >
+                    <div style={{ padding: "0 10px" }}>Fiat Balance</div>
+                    <div style={{ padding: "0 10px" }}>{fiatBalance} USD</div>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      style={{ padding: "0 10px" }}
+                      onClick={() => {
+                        props.onHandleTopup(!props.showPaymentFiat);
+                      }}
+                    >
+                      Top up
+                    </Button>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <CheckboxListSecondary2
+                    tokens={charges}
+                    setShowPayment={props.setShowPayment}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+          </TabPanel>
+          <TabPanel value={value} index={1} dir={theme.direction}>
+            <Box
+              sx={{
+                paddingY: "10px",
+                width: "50%",
+                margin: "auto",
+              }}
             >
-              <Box
-                sx={{
-                  fontSize: "1.2rem",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  paddingY: "10px",
-                  flex: 1,
-                }}
-              >
-                <div>Crypto Balance</div>
-                <div>{price * maticBalance} USD </div>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <CheckboxListSecondary
-                tokens={tokens}
-                setShowPayment={props.setShowPayment}
-              />
-            </AccordionDetails>
-          </Accordion>
-        </Box>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Box
+                    sx={{
+                      fontSize: "1.2rem",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      paddingY: "10px",
+                      flex: 1,
+                    }}
+                  >
+                    <div>Crypto Balance</div>
+                    <div>{price * maticBalance} USD </div>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <CheckboxListSecondary
+                    tokens={tokens}
+                    setShowPayment={props.setShowPayment}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+          </TabPanel>
+        </SwipeableViews>
       </Grid>
       <Box
         sx={{
@@ -588,23 +794,8 @@ function CheckboxListSecondary(props: CheckListProps) {
       {props.tokens.map((value) => {
         const labelId = `checkbox-list-secondary-label-${value.name}`;
         return (
-          <ListItem
-            key={value.name}
-            secondaryAction={
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ padding: "0 10px" }}
-                onClick={() => {
-                  setShowPayment(true, "PAY");
-                }}
-              >
-                send
-              </Button>
-            }
-            disablePadding
-          >
-            <ListItemButton>
+          <ListItem key={value.name} disablePadding>
+            {/* <ListItemButton>
               <ListItemAvatar>
                 <Avatar
                   alt={`Avatar n°${value}`}
@@ -616,7 +807,45 @@ function CheckboxListSecondary(props: CheckListProps) {
                 id={labelId}
                 primary={`${value.balance} ${value.symbol}`}
               />
-            </ListItemButton>
+            </ListItemButton> */}
+            <Accordion sx={{ flex: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+                sx={{ flex: 1 }}
+              >
+                <ListItemButton>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={`Avatar n°${value}`}
+                      src={`/static/images/avatar/${value}.jpg`}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText id={labelId} primary={`${value.name}`} />
+                  <ListItemText
+                    id={labelId}
+                    primary={`${value.balance} ${value.symbol}`}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ padding: "0 10px" }}
+                    onClick={() => {
+                      setShowPayment(true, "PAY");
+                    }}
+                  >
+                    send
+                  </Button>
+                </ListItemButton>
+              </AccordionSummary>
+              <AccordionDetails>
+                {/* <CheckboxListSecondary2
+                  tokens={charges}
+                  setShowPayment={props.setShowPayment}
+                /> */}
+              </AccordionDetails>
+            </Accordion>
           </ListItem>
         );
       })}
@@ -671,7 +900,7 @@ function CheckboxListSecondary2(props: CheckListProps2) {
                 /> */}
               </ListItemAvatar>
               <ListItemText id={labelId} primary={`IN`} />
-              <ListItemText id={labelId} primary={`${value.amount/100} $`} />
+              <ListItemText id={labelId} primary={`${value.amount / 100} $`} />
             </ListItemButton>
           </ListItem>
         );
@@ -701,3 +930,37 @@ const NetworkOptions = (props: NetworkData) => {
     </FormControl>
   );
 };
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  dir?: string;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+}

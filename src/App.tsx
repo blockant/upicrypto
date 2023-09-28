@@ -108,7 +108,8 @@ function App() {
               />
             ) : (
               <Wallet
-                profile={profile}
+                  profile={profile}
+                  setProfile={setProfile}
                 setShowPayment={togglePayment}
                 setShowQRScanner={setShowQRScanner}
                 walletAddress={walletAddress}
