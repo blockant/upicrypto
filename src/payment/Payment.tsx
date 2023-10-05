@@ -83,6 +83,7 @@ interface PaymentProps {
   paymentFormProps: PaymentFormProps;
   walletAddress: string;
   network: string;
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Payment = (props: PaymentProps) => {
@@ -92,7 +93,7 @@ const Payment = (props: PaymentProps) => {
   const transactionCharges: number =
     props.paymentFormProps.transactionAmount > 0
       ? props.paymentFormProps.transactionAmount
-      : 1.76;
+      : 0.01;
   const [availableCurrency, setAvailableCurrency] = useState<CurrencyAmount[]>(
     []
   );
@@ -119,7 +120,7 @@ const Payment = (props: PaymentProps) => {
       };
 
       const response = await fetch(
-        "http://localhost:8000/execute-transaction",
+        `${process.env.REACT_APP_SERVER_URL}/execute-transaction`,
         {
           method: "POST",
           headers: headers,
@@ -132,6 +133,7 @@ const Payment = (props: PaymentProps) => {
 
       if (data.txHash) {
         setPaymentStatus("PAYMENT_SUCCESS");
+        props.setRefresh((state) => !state);
       } else {
         setPaymentStatus("PAYMENT_FAILED");
       }

@@ -7,6 +7,7 @@ import {
   Container,
   Divider,
   Grid,
+  TextField,
   Typography,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -54,6 +55,8 @@ import HelpIcon from "@mui/icons-material/Help";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import Modal from "@mui/material/Modal";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 const modalStyle = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -92,6 +95,20 @@ interface WalletProps {
   onHandleTopup: (fiatPayment: boolean) => void;
   showPaymentFiat: boolean;
   setAppNetwork: Dispatch<SetStateAction<string>>;
+  refresh: boolean;
+}
+interface Preferences {
+  email: string;
+  walletAddress: string;
+  fetchNetworks: (walletAddress: string) => Promise<void>;
+}
+interface Network {
+  _id: string;
+  networkName: string;
+  chainId: string;
+  rpcUrl: string;
+  currencySymbol: string;
+  blockExplorerUrl: string;
 }
 
 interface CheckListProps {
@@ -203,6 +220,7 @@ interface ChargeData {
 interface NetworkData {
   setNetwork: Dispatch<SetStateAction<string>>;
   network: string;
+  networks: Network[];
 }
 const Wallet = (props: WalletProps) => {
   const [wallet, setWallet] = useState();
@@ -210,24 +228,29 @@ const Wallet = (props: WalletProps) => {
   const [maticBalance, setMaticBalance] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [tokens, setTokens] = useState<TokenData[]>([]);
-  const [network, setNetwork] = useState<string>("Polygon");
+  const [network, setNetwork] = useState<string>("Loading..");
   const [fiatBalance, setFiatBalance] = useState<number>(0);
   const [availableCurrency, setAvailableCurrency] = useState<CurrencyAmount[]>(
     []
   );
   const [charges, setCharges] = useState<ChargeData[]>([]);
   const [value, setValue] = React.useState(0);
+  const [networks, setNetworks] = useState<Network[]>([]);
 
   const networkOptions: Record<string, { name: string; symbol: string }> = {
     Ethereum: { name: "Ethereum", symbol: "ETH" },
     Polygon: { name: "Polygon", symbol: "MATIC" },
-    "Mumbai Testnet": { name: "Mumbai Testnet", symbol: "MATIC" },
+    "Mumbai Testnet": { name: "Mumbai Netowrk", symbol: "MATIC" },
     Kovan: { name: "Kovan", symbol: "ETH" },
   };
 
   const [openModal, setOpenModal] = React.useState(false);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const [openPreferenceModal, setOpenPreferenceModal] = React.useState(false);
+  const handleOpenPreferenceModal = () => setOpenPreferenceModal(true);
+  const handleClosePreferenceModal = () => setOpenPreferenceModal(false);
   const theme = useTheme();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -236,6 +259,7 @@ const Wallet = (props: WalletProps) => {
 
   function handleLogout() {
     props.setProfile(null);
+    window.location.reload();
   }
 
   const handleChangeIndex = (index: number) => {
@@ -251,11 +275,31 @@ const Wallet = (props: WalletProps) => {
     setAnchorEl(null);
   };
 
+  async function fetchNetworks(walletAddress: string) {
+    console.log("Networks  fetching.......");
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/networks/${walletAddress}`
+      );
+
+      const data = await response.json();
+      const fetchedNetworks = data.networks;
+
+      setNetwork(fetchedNetworks[0].networkName);
+
+      console.log("fetched netowrks from the function", fetchedNetworks);
+
+      setNetworks(fetchedNetworks);
+    } catch (error) {
+      console.error("Error fetching networks:", error);
+    }
+  }
+
   async function updateBalance(walletAddress: string) {
     try {
       console.log("inside update fiat balance ", walletAddress);
       const response = await fetch(
-        `http://localhost:8000/get-wallet-balance/${walletAddress}`
+        `${process.env.REACT_APP_SERVER_URL}/get-wallet-balance/${walletAddress}`
       );
 
       if (!response.ok) {
@@ -276,7 +320,7 @@ const Wallet = (props: WalletProps) => {
     try {
       console.log("inside update fiat balance ", walletAddress);
       const response = await fetch(
-        `http://localhost:8000/get-charges-new/${walletAddress}`
+        `${process.env.REACT_APP_SERVER_URL}/get-charges-new/${walletAddress}`
       );
 
       if (!response.ok) {
@@ -318,6 +362,10 @@ const Wallet = (props: WalletProps) => {
       const price = data.market_data.current_price.usd.toLocaleString();
       setPrice(price);
     } catch (error) {}
+  }
+
+  function handleClipboard() {
+    navigator.clipboard.writeText(props.walletAddress);
   }
 
   const getTokenBalances = async (address: string): Promise<TokenData[]> => {
@@ -419,6 +467,7 @@ const Wallet = (props: WalletProps) => {
     getMaticPrice();
     updateBalance(props.walletAddress);
     getCharges(props.walletAddress);
+    fetchNetworks(props.walletAddress);
     const tokenBalancesPromise = getTokenBalances(props.walletAddress);
 
     tokenBalancesPromise
@@ -429,7 +478,7 @@ const Wallet = (props: WalletProps) => {
       .catch((error) => {
         console.error("Error while fetching data: ", error);
       });
-  }, [props.walletAddress, network]);
+  }, [props.walletAddress, network, props.refresh]);
   // const tokenBalances = getTokenBalances(
   //   "0x84C632431C444b0b076fc5784cd59c065E75dCdc"
   // ).then;
@@ -484,7 +533,11 @@ const Wallet = (props: WalletProps) => {
                 // justifyContent: "flex-end",
               }}
             >
-              <NetworkOptions setNetwork={setNetwork} network={network} />
+              <NetworkOptions
+                setNetwork={setNetwork}
+                network={network}
+                networks={networks}
+              />
             </Box>
             <React.Fragment>
               <Box
@@ -566,7 +619,7 @@ const Wallet = (props: WalletProps) => {
                   </ListItemIcon>
                   My public Address
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleOpenPreferenceModal}>
                   <ListItemIcon>
                     <ArrowCircleUpIcon fontSize="small" />
                   </ListItemIcon>
@@ -607,13 +660,30 @@ const Wallet = (props: WalletProps) => {
                 </Typography>
               </Box>
             </Modal>
+            <Modal
+              open={openPreferenceModal}
+              onClose={handleClosePreferenceModal}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Preferences
+                email={props.profile.email}
+                walletAddress={props.walletAddress}
+                fetchNetworks={fetchNetworks}
+              />
+            </Modal>
           </Box>
         </Grid>
         <Grid item xs={12}>
           <Box
             sx={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
-            <Button color="inherit" size="small" endIcon={<ContentCopyIcon />}>
+            <Button
+              color="inherit"
+              size="small"
+              endIcon={<ContentCopyIcon />}
+              onClick={handleClipboard}
+            >
               {props.walletAddress}
             </Button>
           </Box>
@@ -912,6 +982,8 @@ const NetworkOptions = (props: NetworkData) => {
   const handleChange = (event: SelectChangeEvent) => {
     props.setNetwork(event.target.value);
   };
+
+  console.log("Avialable networks are", props.networks);
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }}>
       <InputLabel id="demo-simple-select-helper-label">Network</InputLabel>
@@ -922,10 +994,15 @@ const NetworkOptions = (props: NetworkData) => {
         label="Age"
         onChange={handleChange}
       >
-        <MenuItem value={"Ethereum"}>Ethereum</MenuItem>
+        {props.networks.map((network) => (
+          <MenuItem key={network._id} value={network.networkName}>
+            {network.networkName}
+          </MenuItem>
+        ))}
+        {/* <MenuItem value={"Ethereum"}>Ethereum</MenuItem>
         <MenuItem value={"Polygon"}>Polygon</MenuItem>
         <MenuItem value={"Mumbai Testnet"}>Mumbai Testnet</MenuItem>
-        <MenuItem value={"Kovan"}>Kovan</MenuItem>
+        <MenuItem value={"Kovan"}>Kovan</MenuItem> */}
       </Select>
     </FormControl>
   );
@@ -964,3 +1041,177 @@ function a11yProps(index: number) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
+
+const Preferences = (props: Preferences) => {
+  const [isDetailOpen, setisDetailOpen] = useState(false);
+  const [detailOpenId, setdetailOpenId] = useState(0);
+  const [networkName, setNetworkName] = useState("");
+  const [chainId, setChainId] = useState("");
+  const [rpcUrl, setRpcUrl] = useState("");
+  const [blockExplorerUrl, setBlockExplorerUrl] = useState("");
+  const [currencySymbol, setCurrencySymbol] = useState("");
+
+  const handleNavigateBack = () => {
+    setisDetailOpen(false);
+    setdetailOpenId(0);
+  };
+
+  async function handleSubmit(event: any) {
+    event.preventDefault();
+    console.log("Insilde handle submit ");
+    console.log("Network name is ", networkName);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/add-network`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userEmail: props.email,
+          networkName: networkName,
+          chainId: chainId,
+          rpcUrl: rpcUrl,
+          blockExplorerUrl: blockExplorerUrl,
+          currencySymbol: currencySymbol,
+        }),
+      });
+      const data = await response.json();
+      console.log("Data ", data);
+      props.fetchNetworks(props.walletAddress);
+      setisDetailOpen(false);
+      setdetailOpenId(0);
+    } catch (error) {
+      console.log("Error While Saving network ", error);
+      setisDetailOpen(false);
+      setdetailOpenId(0);
+    }
+  }
+
+  const getPageContent = () => {
+    switch (detailOpenId) {
+      case 0:
+        return <div>settings content</div>;
+      case 1:
+        return <div>other content</div>;
+      case 4:
+        return (
+          <>
+            <Box sx={{ ...modalStyle, padding: 0 }}>
+              <form className="flex flex-col p_10" onSubmit={handleSubmit}>
+                <div
+                  className="flex align_center"
+                  style={{
+                    margin: "1rem 0",
+                  }}
+                >
+                  <ArrowBackIosIcon
+                    onClick={() => {
+                      handleNavigateBack();
+                    }}
+                  />
+                  <h2 className="text_center m_auto">Add network</h2>
+                </div>
+                <TextField
+                  id="outlined-basic"
+                  label="Network Name"
+                  variant="outlined"
+                  onChange={(event) => setNetworkName(event.target.value)}
+                />
+                <TextField
+                  id="outlined-basic"
+                  label="New RPC URL"
+                  variant="outlined"
+                  onChange={(event) => setRpcUrl(event.target.value)}
+                />
+                <TextField
+                  id="outlined-basic"
+                  label="Chain Id"
+                  variant="outlined"
+                  onChange={(event) => setChainId(event.target.value)}
+                />
+                <TextField
+                  id="outlined-basic"
+                  label="Currency Symbol"
+                  variant="outlined"
+                  onChange={(event) => setCurrencySymbol(event.target.value)}
+                />
+                <TextField
+                  id="outlined-basic"
+                  label="Block Explorer Url"
+                  variant="outlined"
+                  onChange={(event) => setBlockExplorerUrl(event.target.value)}
+                />
+                <div className="flex flex-row p_10 justify_center">
+                  <Button
+                    variant="contained"
+                    style={{ margin: "0.5rem" }}
+                    type="submit"
+                  >
+                    Save
+                  </Button>
+                  <Button variant="outlined" style={{ margin: "0.5rem" }}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Box>
+          </>
+        );
+      default:
+        break;
+    }
+  };
+
+  return (
+    <Box sx={{ ...modalStyle, padding: 0 }}>
+      <Paper elevation={3}>
+        {isDetailOpen ? (
+          getPageContent()
+        ) : (
+          <List>
+            {[
+              {
+                heading: "General",
+                subHeading: "primary currency, language and search engine",
+              },
+              {
+                heading: "Settings& Privacy",
+                subHeading: "Privacy Setting , private Key",
+              },
+              {
+                heading: "Advanced",
+                subHeading: "Access developer Feature,Reset Account",
+              },
+              {
+                heading: "Contacts",
+                subHeading: "Add , edit , Remove , manage your contacts",
+              },
+              { heading: "Networks", subHeading: "Add or Edit RPC Networks" },
+            ].map((item, index) => {
+              return (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      setisDetailOpen(true);
+                      setdetailOpenId(index);
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <Typography sx={{ fontSize: "1.3rem" }}>
+                        {item.heading}
+                      </Typography>
+                      <p>{item.subHeading}</p>
+                    </div>
+
+                    <ArrowForwardIosIcon />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
+      </Paper>
+    </Box>
+  );
+};

@@ -39,6 +39,7 @@ function App() {
   const [profile, setProfile] = useState<any>();
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [network, setAppNetwork] = useState<string>("Polygon");
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   useEffect(() => {
     if (showPayment) setShowQRScanner(false);
@@ -47,7 +48,7 @@ function App() {
     console.log("inside checkand update");
     try {
       const response = await fetch(
-        `http://localhost:8000/check-wallet/${userEmail}`
+        `${process.env.REACT_APP_SERVER_URL}/check-wallet/${userEmail}`
       );
 
       if (!response.ok) {
@@ -108,14 +109,15 @@ function App() {
               />
             ) : (
               <Wallet
-                  profile={profile}
-                  setProfile={setProfile}
+                profile={profile}
+                setProfile={setProfile}
                 setShowPayment={togglePayment}
                 setShowQRScanner={setShowQRScanner}
                 walletAddress={walletAddress}
                 showPaymentFiat={showPaymentFiat}
                 onHandleTopup={onHandleTopup}
                 setAppNetwork={setAppNetwork}
+                refresh={refresh}
               />
             )}
           </>
@@ -144,6 +146,7 @@ function App() {
             closePayment={togglePayment}
             walletAddress={walletAddress}
             network={network}
+            setRefresh={setRefresh}
           />
         </Drawer>
         <Drawer
@@ -158,6 +161,7 @@ function App() {
             closePayment={togglePaymentFiat}
             walletAddress={walletAddress}
             network={network}
+            setRefresh={setRefresh}
           />
         </Drawer>
       </div>

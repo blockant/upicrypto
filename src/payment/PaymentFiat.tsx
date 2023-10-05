@@ -85,8 +85,10 @@ interface PaymentProps {
   paymentFormProps: PaymentFormProps;
   walletAddress: string;
   network: string;
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+console.log("PUBLICKEY ", process.env.REACT_APP_PUBLISHABLE_KEY);
 const PaymentFiat = (props: PaymentProps) => {
   const [payee, setPayee] = useState<string>(props.paymentFormProps.payee);
   const [currency, setCurrency] = useState<CurrencyAmount | undefined>();
@@ -189,9 +191,7 @@ const PaymentFiat = (props: PaymentProps) => {
   const handleAddFiat = async (token: any) => {
     setPaymentStatus("LOADING");
     console.log("Inside");
-    const stripe = await loadStripe(
-      "pk_test_51JBHmhSF8NnOLJjSzxttXK30JjAWSQdihSp5MhhvUJGneFMCVm1v0fH8kVnqtPRgT2kCVaSW6tCpYrwPyAo4s5rZ00YmoLsoPX"
-    );
+    const stripe = await loadStripe(process.env.REACT_APP_PUBLISHABLE_KEY);
     const body = {
       address: props.walletAddress,
       amount: amount,
@@ -201,17 +201,23 @@ const PaymentFiat = (props: PaymentProps) => {
       "Content-Type": "application/json",
     };
 
-    const response = await fetch("http://localhost:8000/payment", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/payment`,
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
+      }
+    );
     let result;
 
     result = await response.json();
     console.log("Session", result);
-    if (result && result.error) {
+    if (result && !result.error) {
       setPaymentStatus("PAYMENT_SUCCESS");
+      props.setRefresh((state) => !state);
+    } else {
+      setPaymentStatus("PAYMENT_FAILED");
     }
 
     //  if (stripe) {
@@ -220,7 +226,6 @@ const PaymentFiat = (props: PaymentProps) => {
     //    });
     //  }
     // updateBalance(walletAddress);
-    setPaymentStatus("PAYMENT_SUCCESS");
 
     console.log("result is", result);
 
@@ -508,7 +513,7 @@ const PaymentFiat = (props: PaymentProps) => {
                     </div> */}
             <div className="payment-button-container fullWidth">
               <StripeCheckout
-                stripeKey="pk_test_51JBHmhSF8NnOLJjSzxttXK30JjAWSQdihSp5MhhvUJGneFMCVm1v0fH8kVnqtPRgT2kCVaSW6tCpYrwPyAo4s5rZ00YmoLsoPX"
+                stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
                 token={handleAddFiat}
                 name="Add Fiat"
                 amount={amount * 100}
