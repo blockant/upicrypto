@@ -4,8 +4,14 @@ require("hardhat-contract-sizer");
 require("solidity-docgen");
 const dotenv = require("dotenv");
 dotenv.config({ path: __dirname + "/.env" });
-const { ALCHEMY_API_KEY, POLYGON_PRIVATE_KEY, POLYGONSCAN_API_KEY } =
-  process.env;
+const {
+  ALCHEMY_API_KEY,
+  POLYGON_PRIVATE_KEY,
+  POLYGONSCAN_API_KEY,
+  ZK_EVM_POLYGONSCAN_API_KEY,
+  ZK_EVM_ALCHEMY_API_KEY,
+  GOERLI_ALCHEMY_API_KEY,
+} = process.env;
 
 module.exports = {
   // docgen: { ... },
@@ -23,6 +29,14 @@ module.exports = {
   networks: {
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      accounts: [POLYGON_PRIVATE_KEY],
+    },
+    zkEvm: {
+      url: `https://polygonzkevm-testnet.g.alchemy.com/v2/${ZK_EVM_ALCHEMY_API_KEY}`,
+      accounts: [POLYGON_PRIVATE_KEY],
+    },
+    goerli: {
+      url: `https://eth-goerli.g.alchemy.com/v2/${GOERLI_ALCHEMY_API_KEY}`,
       accounts: [POLYGON_PRIVATE_KEY],
     },
     // gnosis: { //Need xDAI
@@ -45,6 +59,17 @@ module.exports = {
   etherscan: {
     apiKey: {
       polygonMumbai: POLYGONSCAN_API_KEY,
+      zkEvm: ZK_EVM_POLYGONSCAN_API_KEY,
     },
+    customChains: [
+      {
+        network: "zkEvm",
+        chainId: 1442,
+        urls: {
+          apiURL: "https://api-testnet-zkevm.polygonscan.com/api",
+          browserURL: "https://testnet-zkevm.polygonscan.com/",
+        },
+      },
+    ],
   },
 };

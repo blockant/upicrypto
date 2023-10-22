@@ -1,6 +1,7 @@
 # Steps
 
 1. `npx hardhat run scripts/deploy.js --network mumbai`
+
 ```
 entryPoint deployed on polygon mumbai to 0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560
 wallet deployed on polygon mumbai to 0x29C23DE681878F96435451e149570bb10ebE4CE1
@@ -8,39 +9,50 @@ paymaster deployed on polygon mumbai to 0xE6B255a6719f89BEE60dF0bcc971e49212Ff95
 paymasterToken deployed on polygon mumbai to 0x9364930a054fb540d3Ab3086E9c94c19cE6eF794
 factory deployed on polygon mumbai to 0x5b20fA3dabdbCeFF316f97151D398BF9847dF98e
 token deployed on polygon mumbai to 0x1dcd6c91cE4F12CD4e9969A047E43877ADE66A59
+
+
+Zk deployments :-
+entryPoint deployed on polygon zkEvm to 0xCD4fF2FEcFD23C7693157395160dE6eA30609C39
+wallet deployed on polygon zkEvm to 0xA16639E8E84589C462B62C293422B92F5C81F80e
+paymaster deployed on polygon zkEvm to 0x031eAeedd35F3A102118D731dDd63C7CED7A9E01
+paymasterToken deployed on polygon zkEvm to 0x5164Df7ABadbEd8069D03815dC3ED16DaAA7b270
+factory deployed on polygon zkEvm to 0xB4096D858c846fc1C5Ae6f9126235C1935ae2D03
+token deployed on polygon zkEvm to 0xE4D11e00d87E09597F6B043E123A849d8E84C6dE
+Wallet address 0x566E21aFE80E341A2B542A7a1d068202c3b9dD69
+Wallet deployed on ZkEvm : 0x32D709eD4BB7D312bFf7D578e0e36665419E856F
+
+
+goerli deployments:-
+entryPoint deployed on polygon Goerli to 0x17d15ce833AC53e793a27746300A86e36D42162B
+wallet deployed on polygon Goerli to 0x6506BCf9091EF3224D69bbE64715d4957bF16F21
+paymaster deployed on polygon Goerli to 0xB98685ccAdb1FcFC4256B64FdE270b128Ad3cEcD
+paymasterToken deployed on polygon Goerli to 0xF021D789db52348F98549c56A3aba92320248A0D
+factory deployed on polygon Goerli to 0x313d9F7dBF73dFbbBaAe408F6Ef020a6bE38D0f0
+token deployed on polygon Goerli to 0xf1B0601914E5Ef1cA500b5B3298691c31cce6246
+Wallet deployed on Goerli address: 0x4f4Dd9DA8fB62471E53a6536aF2fAF1674DbC933
 ```
 
-2. 
+2.
+
 ```
-npx hardhat verify 0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560 --network mumbai 
-npx hardhat verify --constructor-args scripts/arguments.js 0x29C23DE681878F96435451e149570bb10ebE4CE1 --network mumbai 
+npx hardhat verify 0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560 --network mumbai
+npx hardhat verify --constructor-args scripts/arguments.js 0x29C23DE681878F96435451e149570bb10ebE4CE1 --network mumbai
 npx hardhat verify 0xE6B255a6719f89BEE60dF0bcc971e49212Ff95F8 "0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560" --network mumbai
 npx hardhat verify 0x9364930a054fb540d3Ab3086E9c94c19cE6eF794 "0x4A6Cba149892B8b8ac0dC581a4512D40C2fa7560" --network mumbai
 npx hardhat verify 0x5b20fA3dabdbCeFF316f97151D398BF9847dF98e --network mumbai
 npx hardhat verify 0x1dcd6c91cE4F12CD4e9969A047E43877ADE66A59 --network mumbai
 ```
 
-
-
 # Account Abstraction (EIP-4337)
-
-
-
-
-
 
 ## Introduction:-
 
 ->Users interact with Ethereum using Externally Owned Accounts(EOAs). This is the only way to start a transaction or execute a smart contract. This limits how users can interact with Ethereum. For example, it makes it difficult to do batches of transactions and requires users to always keep an ETH balance to cover gas.
 
-
 Account abstraction is a way to solve these problems by allowing users to flexibly program more security and better user experiences into their accounts. This can happen by upgrading EOAs so they can be controlled by smart contracts, or by upgrading smart contracts so they can initiate transactions. These options both require changes to the Ethereum protocol. There is also a third path involving adding a second, separate transaction system to run in parallel to the existing protocol. Regardless of the route, the outcome is access to Ethereum via smart contract wallets, either natively supported as part of the existing protocol or via an add-on transaction network.
 
-
 ERC-4337(Account Abstraction via Entry Point Contract specification) is a specification that aims to use an entry point contract to achieve account abstraction without changing the consensus layer protocol of Ethereum.
-	
 Instead of modifying the logic of the consensus layer itself, ERC-4337 replicates the functionality of the transaction mempool in a higher-level system. Users send UserOperation objects that package up the user’s intent along with signatures and other data for verification. Either miners or bundlers using services such as Flashbots can package up a set of UserOperation objects into a single “bundle transaction”, which then gets included into an Ethereum block.
-
 
 ERC-4337 also introduces a Paymaster mechanism that can enable users to pay gas fees using ERC-20 tokens (e.g. USDC) instead of ETH or to allow a third party to sponsor their gas fees altogether, all in a decentralized fashion.
 
@@ -54,12 +66,10 @@ ERC-4337 also introduces a Paymaster mechanism that can enable users to pay gas 
 
 - EntryPoint:- EntryPoint is a smart contract that handles the verification and execution logic for transactions. Account Contracts are smart contract accounts owned by a user.
 
-
-- Account Contract:-  Account Contract is the smart contract wallet of a user. Wallet developers are required to implement at least two custom functions - one to verify signatures, and another to process transactions.
+- Account Contract:- Account Contract is the smart contract wallet of a user. Wallet developers are required to implement at least two custom functions - one to verify signatures, and another to process transactions.
 
 - Factory Contract:- Factory Contract - When using a wallet for the first time, the initCode field of the UserOperation is used to specify the creation of the smart contract wallet. This is used concurrently with the first actual operation of the wallet (in the same UserOperation). Therefore, wallet developers also need to implement the account factory contract. Creating new wallets should use the CREATE2 method to ensure the determinacy of generated addresses.
-- Paymaster Contracts:- Paymaster Contracts are optional smart contract accounts that can sponsor gas fees for Account Contracts, or allow their owners to pay for those fees with ERC-20 tokens instead of ETH. 
-
+- Paymaster Contracts:- Paymaster Contracts are optional smart contract accounts that can sponsor gas fees for Account Contracts, or allow their owners to pay for those fees with ERC-20 tokens instead of ETH.
 
 ## Features
 
@@ -73,4 +83,3 @@ ERC-4337 also introduces a Paymaster mechanism that can enable users to pay gas 
 - Create whitelists: only allow transactions to certain addresses that you know to be safe. This means that even if your private key was stolen, the attacker could not send funds to non-whitelisted destination accounts. These whitelists would require multiple signatures to change them so that an attacker couldn't add their own address to the list unless they had access to several of your backup keys.
 
 - Batched Transactions :- With Account Abstraction, users can streamline their Ethereum interactions by executing multiple transactions in a single, cohesive sequence. For instance, users can seamlessly combine actions like approving a transaction and executing a swap into a singular operation. This not only enhances operational efficiency but also reduces the need for multiple interactions, resulting in a more user-friendly and intuitive experience.
-
