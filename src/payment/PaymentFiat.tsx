@@ -236,7 +236,15 @@ const PaymentFiat = (props: PaymentProps) => {
   useEffect(() => {
     currencyAmountAPI(props.network, props.walletAddress).then(
       (currencies: CurrencyAmount[]) => {
-        setAvailableCurrency(currencies);
+        // setAvailableCurrency(currencies);
+        setAvailableCurrency([
+          {
+            name: "Dollar",
+            abbreviation: "USD",
+            sign: "USD",
+            amount: 1,
+          },
+        ]);
 
         if (!props.paymentFormProps.currency) {
           setCurrency(
@@ -481,7 +489,7 @@ const PaymentFiat = (props: PaymentProps) => {
                   <FormControl fullWidth size="small">
                     <Select
                       id="transaction-currency-select"
-                      value={transactionCurrency.abbreviation}
+                      value="USD" //{transactionCurrency.abbreviation}
                       onChange={handleTransactionCurrencyChange}
                     >
                       {availableCurrency.map((curr) => (

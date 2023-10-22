@@ -107,7 +107,7 @@ export const currencyAmountAPI = (
       try {
         console.log("ADDRESS inside api is ", walletAddress);
         const provider = new ethers.providers.JsonRpcProvider(
-          "https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8"
+          "https://polygonzkevm-testnet.g.alchemy.com/v2/nYeaX4kyXgRrg2BDIwAi1w7fMvH8Spq8"
         );
 
         const balanceWei = await provider.getBalance(walletAddress);
@@ -115,9 +115,9 @@ export const currencyAmountAPI = (
         //  setMaticBalance(Number(balanceEther));
 
         subTokenData = {
-          name: networkOptions[network].name,
-          abbreviation: networkOptions[network].symbol,
-          sign: networkOptions[network].symbol,
+          name: "POLYGON", //networkOptions[network].name,
+          abbreviation: "MATIC", //networkOptions[network].symbol,
+          sign: "MATIC", //networkOptions[network].symbol,
           amount: Number(balanceEther),
         };
       } catch (error) {
@@ -125,67 +125,68 @@ export const currencyAmountAPI = (
         throw error;
       }
 
-      const url = `https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8`;
-      const options = {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          id: 1,
-          jsonrpc: "2.0",
-          method: "alchemy_getTokenBalances",
-          params: [walletAddress],
-        }),
-      };
+      // const url = `https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8`;
+      // const options = {
+      //   method: "POST",
+      //   headers: {
+      //     accept: "application/json",
+      //     "content-type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     id: 1,
+      //     jsonrpc: "2.0",
+      //     method: "alchemy_getTokenBalances",
+      //     params: [walletAddress],
+      //   }),
+      // };
+      const tokenDataArray: CurrencyAmount[] = [subTokenData];
 
       try {
-        const res = await fetch(url, options);
-        const response = await res.json();
-        console.log("response", response);
+        // const res = await fetch(url, options);
+        // const response = await res.json();
+        // console.log("response", response);
 
-        const balances = response["result"];
-        console.log("balances", balances);
+        // const balances = response["result"];
+        // console.log("balances", balances);
 
-        const nonZeroBalances = balances.tokenBalances.filter((token: any) => {
-          return token.tokenBalance !== "0";
-        });
-        console.log("nonXero balances", nonZeroBalances);
+        // const nonZeroBalances = balances.tokenBalances.filter((token: any) => {
+        //   return token.tokenBalance !== "0";
+        // });
+        // console.log("nonXero balances", nonZeroBalances);
 
-        const tokenDataArray: CurrencyAmount[] = await Promise.all(
-          nonZeroBalances.map(async (token: any) => {
-            const metadataOptions = {
-              method: "POST",
-              headers: {
-                accept: "application/json",
-                "content-type": "application/json",
-              },
-              body: JSON.stringify({
-                id: 1,
-                jsonrpc: "2.0",
-                method: "alchemy_getTokenMetadata",
-                params: [token.contractAddress],
-              }),
-            };
+        // const tokenDataArray: CurrencyAmount[] = await Promise.all(
+        //   nonZeroBalances.map(async (token: any) => {
+        //     const metadataOptions = {
+        //       method: "POST",
+        //       headers: {
+        //         accept: "application/json",
+        //         "content-type": "application/json",
+        //       },
+        //       body: JSON.stringify({
+        //         id: 1,
+        //         jsonrpc: "2.0",
+        //         method: "alchemy_getTokenMetadata",
+        //         params: [token.contractAddress],
+        //       }),
+        //     };
 
-            const metadataRes = await fetch(url, metadataOptions);
-            const metadata = await metadataRes.json();
-            const tokenMetadata = metadata["result"];
+        //     const metadataRes = await fetch(url, metadataOptions);
+        //     const metadata = await metadataRes.json();
+        //     const tokenMetadata = metadata["result"];
 
-            const balance = (
-              parseFloat(token.tokenBalance) /
-              Math.pow(10, tokenMetadata.decimals)
-            ).toFixed(2);
+        //     const balance = (
+        //       parseFloat(token.tokenBalance) /
+        //       Math.pow(10, tokenMetadata.decimals)
+        //     ).toFixed(2);
 
-            return {
-              name: tokenMetadata.name,
-              abbrivation: tokenMetadata.symbol,
-              sign: tokenMetadata.symbol,
-              amount: balance,
-            };
-          })
-        );
+        //     return {
+        //       name: tokenMetadata.name,
+        //       abbrivation: tokenMetadata.symbol,
+        //       sign: tokenMetadata.symbol,
+        //       amount: balance,
+        //     };
+        //   })
+        //);
         console.log("TokenArray", tokenDataArray);
         // tokenDataArray.push(subTokenData);
         tokenDataArray.unshift(subTokenData);

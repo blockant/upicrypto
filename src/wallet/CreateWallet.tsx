@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
+import { AuthProviderContext } from "../features/auth/AuthProvider";
 
 import "./CreateWallet.css"; // Import the CSS module
 const walletStyle = {
@@ -46,6 +47,7 @@ const CreateWallet = (props: CreateWalletProps) => {
     t: "",
     owner: "", // Added type for owner
   });
+  const context = useContext(AuthProviderContext);
 
   function handleWallet() {
     props.setWalletAddress(walletAddress);
@@ -74,16 +76,19 @@ const CreateWallet = (props: CreateWalletProps) => {
     }
     console.log("HEre");
     try {
-      const response = await fetch("http://localhost:8000/deploy-wallet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formValues,
-          userEmail: props.email,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/deploy-wallet`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formValues,
+            userEmail:  context.email,
+          }),
+        }
+      );
       const data = await response.json();
       setWalletAddressHere(data.walletAddress);
       props.setWalletAddress(data.walletAddress);

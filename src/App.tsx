@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 // import { loadStripe } from "@stripe/stripe-js";
 import "./App.css";
 import Payment, { PaymentFormProps } from "./payment/Payment";
@@ -9,6 +9,11 @@ import { Box, Drawer, Slide } from "@mui/material";
 import QRScannerComponent from "./qrScanner/QRScannerComponent";
 import CreateWallet from "./wallet/CreateWallet";
 import PaymentFiat from "./payment/PaymentFiat";
+import {
+  AuthConsumer,
+  AuthProvider,
+  AuthProviderContext,
+} from "./features/auth/AuthProvider";
 
 const theme = createTheme({
   palette: {
@@ -41,6 +46,8 @@ function App() {
   const [network, setAppNetwork] = useState<string>("Polygon");
   const [refresh, setRefresh] = useState<boolean>(false);
 
+  const context = useContext(AuthProviderContext);
+
   useEffect(() => {
     if (showPayment) setShowQRScanner(false);
   }, [showPayment]);
@@ -72,8 +79,10 @@ function App() {
     }
   }
   useEffect(() => {
-    profile && checkAndUpdateWallet(profile.email);
-  }, [profile]);
+    console.log("running Effect", context);
+
+    context.email && checkAndUpdateWallet(context.email);
+  }, [context.email]);
 
   const togglePayment = (show: boolean, action: string) => {
     setShowPayment(show);
@@ -100,7 +109,44 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <div className="app-container">
-        {profile ? (
+        {/* <AuthProvider> */}
+        <AuthConsumer>
+          {(auth) => {
+            console.log("Auth", auth.provider);
+
+            return (
+              <>
+                {auth.provider ? (
+                  <>
+                    {!walletAddress ? (
+                      <CreateWallet
+                        email={profile}
+                        setWalletAddress={setWalletAddress}
+                      />
+                    ) : (
+                      <Wallet
+                        profile={profile}
+                        setProfile={setProfile}
+                        setShowPayment={togglePayment}
+                        setShowQRScanner={setShowQRScanner}
+                        walletAddress={walletAddress}
+                        showPaymentFiat={showPaymentFiat}
+                        onHandleTopup={onHandleTopup}
+                        setAppNetwork={setAppNetwork}
+                        refresh={refresh}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <Login setProfile={setProfile} />
+                )}
+              </>
+            );
+          }}
+        </AuthConsumer>
+        {/* </AuthProvider> */}
+
+        {/* {profile ? (
           <>
             {!walletAddress ? (
               <CreateWallet
@@ -123,7 +169,7 @@ function App() {
           </>
         ) : (
           <Login setProfile={setProfile} />
-        )}
+        )} */}
         <Drawer
           anchor="bottom"
           open={showQRScanner}

@@ -11,7 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+  useContext,
+} from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { createWalletAPI } from "../api/api";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -57,6 +63,7 @@ import Modal from "@mui/material/Modal";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import { AuthProviderContext } from "../features/auth/AuthProvider";
 const modalStyle = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -253,11 +260,14 @@ const Wallet = (props: WalletProps) => {
   const handleClosePreferenceModal = () => setOpenPreferenceModal(false);
   const theme = useTheme();
 
+  const context = useContext(AuthProviderContext);
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   function handleLogout() {
+    context.logout();
     props.setProfile(null);
     window.location.reload();
   }
@@ -372,23 +382,27 @@ const Wallet = (props: WalletProps) => {
     let subTokenData;
     try {
       const provider = new ethers.providers.JsonRpcProvider(
-        "https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8"
+        "https://polygonzkevm-testnet.g.alchemy.com/v2/nYeaX4kyXgRrg2BDIwAi1w7fMvH8Spq8" //"https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8"
       );
 
       const balanceWei = await provider.getBalance(address);
       const balanceEther = ethers.utils.formatEther(balanceWei);
+      console.log("BALANCE IN ETHER IS", balanceEther);
       setMaticBalance(Number(balanceEther));
 
       subTokenData = {
-        name: networkOptions[network].name,
-        symbol: networkOptions[network].symbol,
+        // name: networkOptions[network].name,
+        // symbol: networkOptions[network].symbol,
+        name: networks[0].networkName,
+        symbol: networks[0].currencySymbol,
         balance: balanceEther,
       };
     } catch (error) {
       console.error(`Error fetching balance: ${error}`);
       throw error;
     }
-    const url = `https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8`;
+    const url =
+      "https://polygonzkevm-testnet.g.alchemy.com/v2/nYeaX4kyXgRrg2BDIwAi1w7fMvH8Spq8"; //`https://polygon-mumbai.g.alchemy.com/v2/KFGiZ9X78dt4jBe16IjpjVXbhlPzuSx8`;
     const options = {
       method: "POST",
       headers: {
@@ -404,50 +418,51 @@ const Wallet = (props: WalletProps) => {
     };
 
     try {
-      const res = await fetch(url, options);
-      const response = await res.json();
+      // const res = await fetch(url, options);
+      // const response = await res.json();
 
-      const balances = response["result"];
+      // const balances = response["result"];
 
-      const nonZeroBalances = balances.tokenBalances.filter((token: any) => {
-        return token.tokenBalance !== "0";
-      });
-      console.log("nonXero balances", nonZeroBalances);
+      // const nonZeroBalances = balances.tokenBalances.filter((token: any) => {
+      //   return token.tokenBalance !== "0";
+      // });
+      // console.log("nonXero balances", nonZeroBalances);
+      const tokenDataArray: TokenData[] = [subTokenData];
 
-      const tokenDataArray: TokenData[] = await Promise.all(
-        nonZeroBalances.map(async (token: any) => {
-          const metadataOptions = {
-            method: "POST",
-            headers: {
-              accept: "application/json",
-              "content-type": "application/json",
-            },
-            body: JSON.stringify({
-              id: 1,
-              jsonrpc: "2.0",
-              method: "alchemy_getTokenMetadata",
-              params: [token.contractAddress],
-            }),
-          };
+      // const tokenDataArray: TokenData[] = await Promise.all(
+      //   nonZeroBalances.map(async (token: any) => {
+      //     const metadataOptions = {
+      //       method: "POST",
+      //       headers: {
+      //         accept: "application/json",
+      //         "content-type": "application/json",
+      //       },
+      //       body: JSON.stringify({
+      //         id: 1,
+      //         jsonrpc: "2.0",
+      //         method: "alchemy_getTokenMetadata",
+      //         params: [token.contractAddress],
+      //       }),
+      //     };
 
-          const metadataRes = await fetch(url, metadataOptions);
-          const metadata = await metadataRes.json();
-          const tokenMetadata = metadata["result"];
+      //     const metadataRes = await fetch(url, metadataOptions);
+      //     const metadata = await metadataRes.json();
+      //     const tokenMetadata = metadata["result"];
 
-          const balance = (
-            parseFloat(token.tokenBalance) /
-            Math.pow(10, tokenMetadata.decimals)
-          ).toFixed(2);
+      //     const balance = (
+      //       parseFloat(token.tokenBalance) /
+      //       Math.pow(10, tokenMetadata.decimals)
+      //     ).toFixed(2);
 
-          return {
-            name: tokenMetadata.name,
-            symbol: tokenMetadata.symbol,
-            balance: balance,
-          };
-        })
-      );
+      //     return {
+      //       name: tokenMetadata.name,
+      //       symbol: tokenMetadata.symbol,
+      //       balance: balance,
+      //     };
+      //   })
+      // );
       console.log("TokenArray", tokenDataArray);
-      tokenDataArray.push(subTokenData);
+      // tokenDataArray.push(subTokenData);
 
       return tokenDataArray;
     } catch (error) {
@@ -488,7 +503,7 @@ const Wallet = (props: WalletProps) => {
   // },[])
 
   useEffect(() => {
-    createWalletAPI(props.profile.email)
+    createWalletAPI(context.email)
       .then((response) => {
         if (!response.ok) {
           alert("Wallet creation failed.");
@@ -667,7 +682,7 @@ const Wallet = (props: WalletProps) => {
               aria-describedby="modal-modal-description"
             >
               <Preferences
-                email={props.profile.email}
+                email={context.email}
                 walletAddress={props.walletAddress}
                 fetchNetworks={fetchNetworks}
               />
@@ -1062,20 +1077,23 @@ const Preferences = (props: Preferences) => {
     console.log("Network name is ", networkName);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/add-network`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userEmail: props.email,
-          networkName: networkName,
-          chainId: chainId,
-          rpcUrl: rpcUrl,
-          blockExplorerUrl: blockExplorerUrl,
-          currencySymbol: currencySymbol,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/add-network`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userEmail: props.email,
+            networkName: networkName,
+            chainId: chainId,
+            rpcUrl: rpcUrl,
+            blockExplorerUrl: blockExplorerUrl,
+            currencySymbol: currencySymbol,
+          }),
+        }
+      );
       const data = await response.json();
       console.log("Data ", data);
       props.fetchNetworks(props.walletAddress);
